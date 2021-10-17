@@ -25,36 +25,50 @@ public class ExamController extends HttpServlet {
             throws ServletException, IOException {
         Timestamp current = new Timestamp(System.currentTimeMillis());
         HttpSession session = request.getSession();
-        Test test = (Test)session.getAttribute("Test");
+        Test test = (Test) session.getAttribute("Test");
         if (test == null) {
             response.sendRedirect("home");
-        }
-        else if (test.getExamEndTime().before(current)) {
+        } else if (test.getExamEndTime().before(current)) {
             session.setAttribute("Test", null);
             response.sendRedirect("home");
         } else {
             request.getRequestDispatcher("exam.jsp").forward(request, response);
-        }        
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Test test = (Test)session.getAttribute("Test");
-        Authentication auth = (Authentication)session.getAttribute("Auth");
+        Test test = (Test) session.getAttribute("Test");
+        Authentication auth = (Authentication) session.getAttribute("Auth");
         if (test == null) {
             response.sendRedirect("home");
             return;
         }
         int count = 0;
         for (Question q : test.getQuestions()) {
+            int count1 = 0;
             for (Answer a : q.getAnswers()) {
-                a.setSelected(Objects.deepEquals(request.getParameter("answerID-" + a.getAnswerID()),"on"));
-                count += (a.isSelected() ? 1 : 0);
+                a.setSelected(Objects.deepEquals(request.getParameter("answerID-" + a.getAnswerID()), "on"));
+                count1 += (a.isSelected() ? 1 : 0);
             }
+            if (count1 > q.getMaxChoose()) {
+                request.setAttribute("Code", "400");
+                request.setAttribute("Detail", "Your exam was submitted is invalid!");
+                request.setAttribute("Msg", "Please retake another exam");
+                request.getRequestDispatcher("notification.jsp").forward(request, response);
+                session.setAttribute("Test", null);
+                return;
+            }
+            count += count1;
         }
         int recordID = DataAccessObject.getRecordID(test.getTestCode(), auth.getID());
         DataAccessObject.saveRecord(recordID, test, count);
+        request.setAttribute("Code", "Success");
+        request.setAttribute("Detail", "Your test has been recorded");
+        request.setAttribute("Msg", "Your test result will be announced later");
+        request.getRequestDispatcher("notification.jsp").forward(request, response);
+        session.setAttribute("Test", null);
     }
 }

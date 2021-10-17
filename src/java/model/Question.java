@@ -6,12 +6,14 @@ public class Question {
     private int questionID;
     private String content;
     private int mark;
+    private int maxChoose;
     private List<Answer> answers;
 
-    public Question(int questionID, String content, int mark, List<Answer> answers) {
+    public Question(int questionID, String content, int mark, int maxChoose, List<Answer> answers) {
         this.questionID = questionID;
         this.content = content;
         this.mark = mark;
+        this.maxChoose = maxChoose;
         this.answers = answers;
     }
     
@@ -29,6 +31,14 @@ public class Question {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public int getMaxChoose() {
+        return maxChoose;
+    }
+
+    public void setMaxChoose(int maxChoose) {
+        this.maxChoose = maxChoose;
     }
 
     public List<Answer> getAnswers() {
@@ -49,6 +59,6 @@ public class Question {
 
     @Override
     public String toString() {
-        return "Question{" + "questionID=" + questionID + ", content=" + content + ", mark=" + mark + ", answers=" + answers + '}';
+        return "Question{" + "questionID=" + questionID + ", content=" + content + ", mark=" + mark + ", maxChoose=" + maxChoose + ", answers=" + answers + '}';
     }
 }

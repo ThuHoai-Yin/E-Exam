@@ -29,12 +29,12 @@ public class RootFilter implements Filter {
 
         String servletPath = request.getServletPath();
 
-        if (servletPath.endsWith(".jsp")) {
-            request.setAttribute("ErrCode", "404");
-            request.setAttribute("ErrDetail", "Not Found");
-            request.setAttribute("ErrMsg", "Please check URL in address bar and try again");
-            request.getRequestDispatcher("error.jsp").forward(request, response);
-        }
+//        if (servletPath.endsWith(".jsp")) {
+//            request.setAttribute("ErrCode", "404");
+//            request.setAttribute("ErrDetail", "Not Found");
+//            request.setAttribute("ErrMsg", "Please check URL in address bar and try again");
+//            request.getRequestDispatcher("error.jsp").forward(request, response);
+//        }
 
         Cookie cookie = null;
         if (request.getCookies() != null) {
@@ -53,10 +53,10 @@ public class RootFilter implements Filter {
                 session.setAttribute("Auth", auth);
             }
             if (!SecurityConfig.checkAuthorization(servletPath, auth.getRole())) {
-                request.setAttribute("ErrCode", "403");
-                request.setAttribute("ErrDetail", "Forbidden");
-                request.setAttribute("ErrMsg", "Your role cannot access this content");
-                request.getRequestDispatcher("error.jsp").forward(request, response);
+                request.setAttribute("Code", "403");
+                request.setAttribute("Detail", "Forbidden");
+                request.setAttribute("Msg", "Your role cannot access this content");
+                request.getRequestDispatcher("notification.jsp").forward(request, response);
             }
         } else if (auth == null && SecurityConfig.needAuthentication(servletPath)) {
             response.sendRedirect("login");

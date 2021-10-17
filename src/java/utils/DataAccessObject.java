@@ -96,41 +96,113 @@ public class DataAccessObject {
         }
     }
 
-    public static Test getTest(String testCode) {
+    public static List<Test> getTest(String testCode) {
+        List<Test> tests = new ArrayList<>();
         try {
             try (Connection conn = DBContext.getConnection()) {
-                String query = "select * from testTbl where testCode = ?";
+                String query = "select * from testTbl tt \n"
+                        + "inner join testDetailTbl tdt on tt.testCode = tdt.testCode \n"
+                        + "inner join questionTbl qt on qt.questionID = tdt.questionID \n"
+                        + "inner join answerTbl at2 on qt.questionID = at2.questionID\n"
+                        + (testCode != null ? "where tt.testCode = ?\n" : "")
+                        + "order by tt.testCode, qt.questionID";
                 PreparedStatement stm = conn.prepareStatement(query);
-                stm.setString(1, testCode);
-                ResultSet resset = stm.executeQuery();
-                if (resset.next()) {
-                    List<Question> questions = getTestQuestions(testCode);
-                    return new Test(testCode, questions, null, resset.getInt("duration"));
+                if (testCode != null) {
+                    stm.setString(1, testCode);
                 }
-
+                ResultSet resset = stm.executeQuery();
+                Test test = null;
+                Question question = null;
+                Answer answer = null;
+                int maxChoose = 0;
+                while (resset.next()) {
+                    testCode = resset.getString("testCode");
+                    int questionID = resset.getInt("questionID");
+                    int answerID = resset.getInt("answerID");
+                    if (test == null || !test.getTestCode().equals(testCode)) {
+                        if (test != null) {
+                            tests.add(test);
+                        }
+                        test = new Test(testCode, new ArrayList<>(), null, resset.getInt("duration"));
+                        question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
+                        answer = new Answer(answerID, resset.getString("answerContent"));
+                        maxChoose = 0;
+                    }
+                    if (question.getQuestionID() != questionID) {
+                        question.setMaxChoose(maxChoose);
+                        test.getQuestions().add(question);
+                        question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
+                        maxChoose = 0;
+                    }
+                    answer = new Answer(answerID, resset.getString("answerContent"));
+                    question.getAnswers().add(answer);
+                    if (resset.getBoolean("isCorrect")) maxChoose++;
+                }
+                if (test == null) {
+                    return tests;
+                }
+                question.setMaxChoose(maxChoose);
+                test.getQuestions().add(question);
+                tests.add(test);
                 stm.close();
             }
         } catch (SQLException ex) {
+            System.out.println(ex.getMessage() + "\n" + ex.getStackTrace());
         }
-        return null;
+        return tests;
     }
 
-    public static List<Bank> getBanks() {
+    public static List<Bank> getBank(int bankID) {
         List<Bank> banks = new ArrayList<>();
         try {
             try (Connection conn = DBContext.getConnection()) {
-                String query = "select * from bankTbl";
+                String query = "select * from bankTbl bt \n"
+                        + "inner join questionTbl qt on bt.bankID = qt.bankID \n"
+                        + "inner join answerTbl at2 on qt.questionID = at2.questionID \n"
+                        + (bankID > 0 ? "where bt.bankID = ?\n" : "")
+                        + "order by bt.bankID,qt.questionID";
                 PreparedStatement stm = conn.prepareStatement(query);
-                ResultSet resset = stm.executeQuery();
-                while (resset.next()) {
-                    int bankID = resset.getInt("bankID");
-                    List<Question> questions = getBankQuestions(bankID);
-                    banks.add(new Bank(bankID, questions, resset.getDate("dateCreated")));
+                if (bankID > 0) {
+                    stm.setInt(1, bankID);
                 }
-
+                ResultSet resset = stm.executeQuery();
+                Bank bank = null;
+                Question question = null;
+                Answer answer = null;
+                int maxChoose = 0;
+                while (resset.next()) {
+                    bankID = resset.getInt("bankID");
+                    int questionID = resset.getInt("questionID");
+                    int answerID = resset.getInt("answerID");
+                    if (bank == null || bank.getBankID() != bankID) {
+                        if (bank != null) {
+                            banks.add(bank);
+                        }
+                        bank = new Bank(bankID, resset.getInt("creatorID"), new ArrayList<>(), resset.getDate("dateCreated"));
+                        question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
+                        answer = new Answer(answerID, resset.getString("answerContent"));
+                        maxChoose = 0;
+                    }
+                    if (question.getQuestionID() != questionID) {
+                        question.setMaxChoose(maxChoose);
+                        bank.getQuestions().add(question);
+                        question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
+                        maxChoose = 0;
+                    }
+                    answer = new Answer(answerID, resset.getString("answerContent"));
+                    question.getAnswers().add(answer);
+                    if (resset.getBoolean("isCorrect")) maxChoose++;
+                }
+                if (bank == null) {
+                    return banks;
+                }
+                question.setMaxChoose(maxChoose);
+                bank.getQuestions().add(question);
+                banks.add(bank);
                 stm.close();
             }
         } catch (SQLException ex) {
+            System.out.println(ex.getMessage() + "\n" + ex.getStackTrace());
         }
         return banks;
     }
@@ -165,91 +237,32 @@ public class DataAccessObject {
         }
     }
 
-    public static List<Question> getTestQuestions(String testCode) {
-        List<Question> questions = new ArrayList<>();
+    public static int getRecordID(String testCode, int studentID) {
         try {
             try (Connection conn = DBContext.getConnection()) {
-                String query = "select a.questionID, b.questionContent, b.mark from testDetailTbl a\n"
-                        + "inner join questionTbl b on a.questionID = b.questionID \n"
-                        + "where a.testCode = ?";
-                PreparedStatement stm = conn.prepareStatement(query);
-                stm.setString(1, testCode);
-                ResultSet resset = stm.executeQuery();
-                while (resset.next()) {
-                    int questionID = resset.getInt("questionID");
-                    List<Answer> answers = getAnswers(questionID);
-                    questions.add(new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), answers));
-                }
-
-                stm.close();
-            }
-        } catch (SQLException ex) {
-        }
-        return questions;
-    }
-
-    public static List<Question> getBankQuestions(int bankID) {
-        List<Question> questions = new ArrayList<>();
-        try {
-            try (Connection conn = DBContext.getConnection()) {
-                String query = "select * from questionTbl where bankID = ?";
-                PreparedStatement stm = conn.prepareStatement(query);
-                stm.setInt(1, bankID);
-                ResultSet resset = stm.executeQuery();
-                while (resset.next()) {
-                    int questionID = resset.getInt("questionID");
-                    List<Answer> answers = getAnswers(questionID);
-                    questions.add(new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), answers));
-                }
-
-                stm.close();
-            }
-        } catch (SQLException ex) {
-        }
-        return questions;
-    }
-
-    public static List<Answer> getAnswers(int questionID) {
-        List<Answer> answers = new ArrayList<>();
-        try {
-            try (Connection conn = DBContext.getConnection()) {
-                String query = "select * from answerTbl where questionID = ?";
-                PreparedStatement stm = conn.prepareStatement(query);
-                stm.setInt(1, questionID);
-                ResultSet resset = stm.executeQuery();
-                while (resset.next()) {
-                    answers.add(new Answer(resset.getInt("answerID"), resset.getString("answerContent")));
-                }
-
-                stm.close();
-            }
-        } catch (SQLException ex) {
-        }
-        return answers;
-    }
-    
-     public static int getRecordID(String testCode, int studentID) {
-        try {
-            try (Connection conn = DBContext.getConnection()) {
-               String query = "select recordID from recordTbl where testCode = ? and studentID = ?";
+                String query = "select recordID from recordTbl where testCode = ? and studentID = ?";
                 PreparedStatement stm = conn.prepareStatement(query);
                 stm.setString(1, testCode);
                 stm.setInt(2, studentID);
                 ResultSet resset = stm.executeQuery();
-                if (!resset.next()) return -1;
-                int res = resset.getInt(1); 
+                if (!resset.next()) {
+                    return -1;
+                }
+                int res = resset.getInt(1);
                 stm.close();
                 return res;
             }
         } catch (SQLException ex) {
         }
         return -1;
-    }    
+    }
 
     public static void saveRecord(int recordID, Test test, int selectedCount) {
         try {
             try (Connection conn = DBContext.getConnection()) {
-
+                if (selectedCount == 0) {
+                    return;
+                }
                 String query = "insert into recordDetailTbl(recordID, answerID) values ";
                 for (int i = 1; i < selectedCount; i++) {
                     query += "(?,?),";
@@ -273,6 +286,7 @@ public class DataAccessObject {
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }
