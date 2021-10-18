@@ -48,7 +48,7 @@ public class HomeController extends HttpServlet {
         if (result.size() > 0) {            
             Test test = DataAccessObject.getTest(testCode).get(0);
             Authentication auth = (Authentication) session.getAttribute("Auth");
-            if (DataAccessObject.createRecord(testCode, auth.getID())) {
+            if (DataAccessObject.initRecord(testCode, auth.getID())) {
                 Timestamp current = new Timestamp(System.currentTimeMillis());
 
                 Calendar cal = Calendar.getInstance();
@@ -60,16 +60,14 @@ public class HomeController extends HttpServlet {
                 session.setAttribute("Test", test);
                 response.sendRedirect("exam");
             } else {
-                request.setAttribute("Code", "409");
-                request.setAttribute("Detail", "Conflict");
-                request.setAttribute("Msg", " Please contact your teacher for more information");
-                request.getRequestDispatcher("notification.jsp").forward(request, response);
+                request.setAttribute("Msg", "You have already taken this test");
+                request.setAttribute("Detail", "Please contact your teacher for more information");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
             }
         } else {
-            request.setAttribute("Code", "404");
-            request.setAttribute("Detail", "Not Found");
-            request.setAttribute("Msg", "Please check test code and try again");
-            request.getRequestDispatcher("notification.jsp").forward(request, response);
+            request.setAttribute("Msg", "This test code doesn't exist");
+            request.setAttribute("Detail", "Please check and try again");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
 }

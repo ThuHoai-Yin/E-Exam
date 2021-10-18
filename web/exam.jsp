@@ -4,7 +4,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Dashboard</title>
+		<title>Exam</title>
 		<link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
 	</head>
 	<body>
@@ -20,7 +20,7 @@
 		</p>
 		<main class="pt-16 flex flex-col items-center">
 			<c:if test="${not empty test}">
-				<form action="exam" method="post" class="my-10 w-1/2 flex flex-col items-center gap-y-3">
+				<form action="exam" method="post" class="my-10 flex flex-col items-center gap-y-3" style="width: 60rem">
 					<c:forEach var="question" items="${test.getQuestions()}" varStatus="qCount">
 						<div class="bg-white rounded w-full p-10">
 							<div class="flex flex-1">

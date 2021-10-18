@@ -20,21 +20,19 @@ public class DataAccessObject {
         try {
             try (Connection conn = DBContext.getConnection()) {
                 String query = "select * from userTbl where username like ? and userRole like ?";
-                PreparedStatement stm = conn.prepareStatement(query);
-                stm.setString(1, username);
-                stm.setString(2, role);
-                ResultSet resset = stm.executeQuery();
-                if (!resset.next()) {
-                    return null;  //Username is not existed      
+                try (PreparedStatement stm = conn.prepareStatement(query)) {
+                    stm.setString(1, username);
+                    stm.setString(2, role);
+                    ResultSet resset = stm.executeQuery();
+                    if (!resset.next()) {
+                        return null;  //Username is not existed      
+                    }
+                    int id = resset.getInt("userID");
+                    byte[] hashed = resset.getBytes("hashedPassword");
+                    byte[] salt = resset.getBytes("salt");
+                    byte[] computedHash = Crypto.computeHash(password, salt);
+                    return Arrays.equals(hashed, computedHash) ? new Authentication(id, username, role) : null;
                 }
-                int id = resset.getInt("userID");
-                byte[] hashed = resset.getBytes("hashedPassword");
-                byte[] salt = resset.getBytes("salt");
-
-                stm.close();
-
-                byte[] computedHash = Crypto.computeHash(password, salt);
-                return Arrays.equals(hashed, computedHash) ? new Authentication(id, username, role) : null;
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
@@ -46,28 +44,26 @@ public class DataAccessObject {
         try {
             try (Connection conn = DBContext.getConnection()) {
                 String query = "select * from userTbl where username like ?";
-                PreparedStatement stm = conn.prepareStatement(query);
-                stm.setString(1, username);
-                ResultSet resset = stm.executeQuery();
-                if (resset.next()) {
-                    return false; //Username is existed  
+                byte[] salt;
+                byte[] hashed;
+                try (PreparedStatement stm = conn.prepareStatement(query)) {
+                    stm.setString(1, username);
+                    ResultSet resset = stm.executeQuery();
+                    if (resset.next()) {
+                        return false; //Username is existed  
+                    }
+                    salt = Crypto.getSalt();
+                    hashed = Crypto.computeHash(password, salt);
                 }
-                byte[] salt = Crypto.getSalt();
-                byte[] hashed = Crypto.computeHash(password, salt);
-
-                stm.close();
 
                 query = "insert into userTbl(username, userRole, hashedPassword, salt) values (?, ?, ?, ?)";
-                stm = conn.prepareStatement(query);
-                stm.setString(1, username);
-                stm.setString(2, role);
-                stm.setBytes(3, hashed);
-                stm.setBytes(4, salt);
-                boolean res = stm.executeUpdate() > 0;
-
-                stm.close();
-
-                return res;
+                try (PreparedStatement stm = conn.prepareStatement(query)) {
+                    stm.setString(1, username);
+                    stm.setString(2, role);
+                    stm.setBytes(3, hashed);
+                    stm.setBytes(4, salt);
+                    return stm.executeUpdate() > 0;
+                }
             }
         } catch (SQLException ex) {
             return false;
@@ -79,16 +75,14 @@ public class DataAccessObject {
 
             try (Connection conn = DBContext.getConnection()) {
                 String query = "select fullname from userDetailTbl where userID = ?";
-                PreparedStatement stm = conn.prepareStatement(query);
-                stm.setInt(1, userID);
-                ResultSet resset = stm.executeQuery();
-                if (!resset.next()) {
-                    return null;
+                try (PreparedStatement stm = conn.prepareStatement(query)) {
+                    stm.setInt(1, userID);
+                    ResultSet resset = stm.executeQuery();
+                    if (!resset.next()) {
+                        return "Unname";
+                    }
+                    return resset.getString(1);
                 }
-                String res = resset.getString(1);
-
-                stm.close();
-                return res;
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage() + " " + userID);
@@ -106,45 +100,47 @@ public class DataAccessObject {
                         + "inner join answerTbl at2 on qt.questionID = at2.questionID\n"
                         + (testCode != null ? "where tt.testCode = ?\n" : "")
                         + "order by tt.testCode, qt.questionID";
-                PreparedStatement stm = conn.prepareStatement(query);
-                if (testCode != null) {
-                    stm.setString(1, testCode);
-                }
-                ResultSet resset = stm.executeQuery();
-                Test test = null;
-                Question question = null;
-                Answer answer = null;
-                int maxChoose = 0;
-                while (resset.next()) {
-                    testCode = resset.getString("testCode");
-                    int questionID = resset.getInt("questionID");
-                    int answerID = resset.getInt("answerID");
-                    if (test == null || !test.getTestCode().equals(testCode)) {
-                        if (test != null) {
-                            tests.add(test);
+                try (PreparedStatement stm = conn.prepareStatement(query)) {
+                    if (testCode != null) {
+                        stm.setString(1, testCode);
+                    }
+                    ResultSet resset = stm.executeQuery();
+                    Test test = null;
+                    Question question = null;
+                    Answer answer = null;
+                    int maxChoose = 0;
+                    while (resset.next()) {
+                        testCode = resset.getString("testCode");
+                        int questionID = resset.getInt("questionID");
+                        int answerID = resset.getInt("answerID");
+                        if (test == null || !test.getTestCode().equals(testCode)) {
+                            if (test != null) {
+                                tests.add(test);
+                            }
+                            test = new Test(testCode, new ArrayList<>(), null, resset.getInt("duration"));
+                            question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
+                            answer = new Answer(answerID, resset.getString("answerContent"));
+                            maxChoose = 0;
                         }
-                        test = new Test(testCode, new ArrayList<>(), null, resset.getInt("duration"));
-                        question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
+                        if (question.getQuestionID() != questionID) {
+                            question.setMaxChoose(maxChoose);
+                            test.getQuestions().add(question);
+                            question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
+                            maxChoose = 0;
+                        }
                         answer = new Answer(answerID, resset.getString("answerContent"));
-                        maxChoose = 0;
+                        question.getAnswers().add(answer);
+                        if (resset.getBoolean("isCorrect")) {
+                            maxChoose++;
+                        }
                     }
-                    if (question.getQuestionID() != questionID) {
-                        question.setMaxChoose(maxChoose);
-                        test.getQuestions().add(question);
-                        question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
-                        maxChoose = 0;
+                    if (test == null) {
+                        return tests;
                     }
-                    answer = new Answer(answerID, resset.getString("answerContent"));
-                    question.getAnswers().add(answer);
-                    if (resset.getBoolean("isCorrect")) maxChoose++;
+                    question.setMaxChoose(maxChoose);
+                    test.getQuestions().add(question);
+                    tests.add(test);
                 }
-                if (test == null) {
-                    return tests;
-                }
-                question.setMaxChoose(maxChoose);
-                test.getQuestions().add(question);
-                tests.add(test);
-                stm.close();
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage() + "\n" + ex.getStackTrace());
@@ -161,45 +157,47 @@ public class DataAccessObject {
                         + "inner join answerTbl at2 on qt.questionID = at2.questionID \n"
                         + (bankID > 0 ? "where bt.bankID = ?\n" : "")
                         + "order by bt.bankID,qt.questionID";
-                PreparedStatement stm = conn.prepareStatement(query);
-                if (bankID > 0) {
-                    stm.setInt(1, bankID);
-                }
-                ResultSet resset = stm.executeQuery();
-                Bank bank = null;
-                Question question = null;
-                Answer answer = null;
-                int maxChoose = 0;
-                while (resset.next()) {
-                    bankID = resset.getInt("bankID");
-                    int questionID = resset.getInt("questionID");
-                    int answerID = resset.getInt("answerID");
-                    if (bank == null || bank.getBankID() != bankID) {
-                        if (bank != null) {
-                            banks.add(bank);
+                try (PreparedStatement stm = conn.prepareStatement(query)) {
+                    if (bankID > 0) {
+                        stm.setInt(1, bankID);
+                    }
+                    ResultSet resset = stm.executeQuery();
+                    Bank bank = null;
+                    Question question = null;
+                    Answer answer = null;
+                    int maxChoose = 0;
+                    while (resset.next()) {
+                        bankID = resset.getInt("bankID");
+                        int questionID = resset.getInt("questionID");
+                        int answerID = resset.getInt("answerID");
+                        if (bank == null || bank.getBankID() != bankID) {
+                            if (bank != null) {
+                                banks.add(bank);
+                            }
+                            bank = new Bank(bankID, resset.getInt("creatorID"), new ArrayList<>(), resset.getDate("dateCreated"));
+                            question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
+                            answer = new Answer(answerID, resset.getString("answerContent"));
+                            maxChoose = 0;
                         }
-                        bank = new Bank(bankID, resset.getInt("creatorID"), new ArrayList<>(), resset.getDate("dateCreated"));
-                        question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
+                        if (question.getQuestionID() != questionID) {
+                            question.setMaxChoose(maxChoose);
+                            bank.getQuestions().add(question);
+                            question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
+                            maxChoose = 0;
+                        }
                         answer = new Answer(answerID, resset.getString("answerContent"));
-                        maxChoose = 0;
+                        question.getAnswers().add(answer);
+                        if (resset.getBoolean("isCorrect")) {
+                            maxChoose++;
+                        }
                     }
-                    if (question.getQuestionID() != questionID) {
-                        question.setMaxChoose(maxChoose);
-                        bank.getQuestions().add(question);
-                        question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
-                        maxChoose = 0;
+                    if (bank == null) {
+                        return banks;
                     }
-                    answer = new Answer(answerID, resset.getString("answerContent"));
-                    question.getAnswers().add(answer);
-                    if (resset.getBoolean("isCorrect")) maxChoose++;
+                    question.setMaxChoose(maxChoose);
+                    bank.getQuestions().add(question);
+                    banks.add(bank);
                 }
-                if (bank == null) {
-                    return banks;
-                }
-                question.setMaxChoose(maxChoose);
-                bank.getQuestions().add(question);
-                banks.add(bank);
-                stm.close();
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage() + "\n" + ex.getStackTrace());
@@ -207,86 +205,79 @@ public class DataAccessObject {
         return banks;
     }
 
-    public static boolean createRecord(String testCode, int studentID) {
+    public static boolean initRecord(String testCode, int studentID) {
         try {
             try (Connection conn = DBContext.getConnection()) {
                 String query = "select * from recordTbl where testCode = ? and studentID = ?";
-                PreparedStatement stm = conn.prepareStatement(query);
-                stm.setString(1, testCode);
-                stm.setInt(2, studentID);
-                ResultSet resset = stm.executeQuery();
-                if (resset.next()) {
+                try (PreparedStatement stm = conn.prepareStatement(query)) {
+                    stm.setString(1, testCode);
+                    stm.setInt(2, studentID);
+                    ResultSet resset = stm.executeQuery();
+                    if (resset.next()) {
 
-                    return false; //Record is existed  
+                        return false; //Record is existed  
+                    }
                 }
-                stm.close();
-
-                query = "insert into recordTbl(testCode, studentID, examDate) values (?, ?, ?)";
-                stm = conn.prepareStatement(query);
-                stm.setString(1, testCode);
-                stm.setInt(2, studentID);
-                stm.setObject(3, new Timestamp(System.currentTimeMillis()));
-                boolean res = stm.executeUpdate() > 0;
-
-                stm.close();
-
-                return res;
+                query = "insert into recordTbl(testCode, studentID, examDate) values (?, ?, getDate())";
+                try (PreparedStatement stm = conn.prepareStatement(query)) {
+                    stm.setString(1, testCode);
+                    stm.setInt(2, studentID);
+                    return stm.executeUpdate() > 0;
+                }
             }
         } catch (SQLException ex) {
-            return false;
+
         }
+        return false;
     }
 
-    public static int getRecordID(String testCode, int studentID) {
+    public static boolean saveRecord(String testCode, int studentID, Test test, int selectedCount) {
         try {
             try (Connection conn = DBContext.getConnection()) {
-                String query = "select recordID from recordTbl where testCode = ? and studentID = ?";
-                PreparedStatement stm = conn.prepareStatement(query);
-                stm.setString(1, testCode);
-                stm.setInt(2, studentID);
-                ResultSet resset = stm.executeQuery();
-                if (!resset.next()) {
-                    return -1;
+                String query = "update recordTbl \n"
+                        + "set dateSummited = getdate()\n"
+                        + "output inserted.recordID\n"
+                        + "where testCode = ? and studentID = ? and dateSummited is null";
+                int recordID;
+                try (PreparedStatement stm = conn.prepareStatement(query)) {
+                    stm.setString(1, testCode);
+                    stm.setInt(2, studentID);
+                    ResultSet resset = stm.executeQuery();
+                    if (!resset.next()) {
+                        stm.close();
+                        return false;
+                    }
+
+                    recordID = resset.getInt(1);
                 }
-                int res = resset.getInt(1);
-                stm.close();
-                return res;
-            }
-        } catch (SQLException ex) {
-        }
-        return -1;
-    }
 
-    public static void saveRecord(int recordID, Test test, int selectedCount) {
-        try {
-            try (Connection conn = DBContext.getConnection()) {
                 if (selectedCount == 0) {
-                    return;
+                    return true;
                 }
-                String query = "insert into recordDetailTbl(recordID, answerID) values ";
+                query = "insert into recordDetailTbl(recordID, answerID) values ";
                 for (int i = 1; i < selectedCount; i++) {
                     query += "(?,?),";
                 }
                 query += "(?,?)";
-                PreparedStatement stm = conn.prepareStatement(query);
-
-                int counter = 1;
-                for (Question q : test.getQuestions()) {
-                    for (Answer a : q.getAnswers()) {
-                        if (a.isSelected()) {
-                            stm.setInt(counter, recordID);
-                            stm.setInt(counter + 1, a.getAnswerID());
-                            counter += 2;
+                try (PreparedStatement stm = conn.prepareStatement(query)) {
+                    int counter = 1;
+                    for (Question q : test.getQuestions()) {
+                        for (Answer a : q.getAnswers()) {
+                            if (a.isSelected()) {
+                                stm.setInt(counter, recordID);
+                                stm.setInt(counter + 1, a.getAnswerID());
+                                counter += 2;
+                            }
                         }
-                    }
+                    };
+                    return stm.executeUpdate() > 0;
                 }
-                stm.executeUpdate();
-                stm.close();
 
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace();
         }
+        return false;
     }
 }

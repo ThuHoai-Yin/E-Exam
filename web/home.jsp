@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>Dashboard</title>
+        <title>Home</title>
         <link href="static/styles.css" rel="stylesheet">
     </head>
     <body>
