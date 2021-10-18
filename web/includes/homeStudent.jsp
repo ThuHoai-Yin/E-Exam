@@ -13,7 +13,7 @@
 					class="bg-transparent h-16 w-96 font-semibold text-2xl outline-none text-center"
 					placeholder="Enter exam code"
 					type="text"
-					name="testCode"
+					name="examCode"
 				/>
 				<button type="submit" class="rounded-full w-10 h-10 font-extrabold bg-blue-500 inline-flex items-center justify-center">
 					<i

@@ -4,26 +4,26 @@ import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.List;
 
-public class Test {
+public class Exam {
 
-    private String testCode;
+    private String examCode;
     private List<Question> questions;
     private Timestamp examEndTime;
     private int duration;
 
-    public Test(String testCode, List<Question> questions, Timestamp examEndTime, int duration) {
-        this.testCode = testCode;
+    public Exam(String examCode, List<Question> questions, Timestamp examEndTime, int duration) {
+        this.examCode = examCode;
         this.questions = questions;
         this.examEndTime = examEndTime;
         this.duration = duration;
     }
 
-    public String getTestCode() {
-        return testCode;
+    public String getExamCode() {
+        return examCode;
     }
 
-    public void setTestCode(String testCode) {
-        this.testCode = testCode;
+    public void setExamCode(String examCode) {
+        this.examCode = examCode;
     }
 
     public List<Question> getQuestions() {
@@ -56,6 +56,6 @@ public class Test {
 
     @Override
     public String toString() {
-        return "Test{" + "testCode=" + testCode + ", questions=" + questions + ", examEndTime=" + examEndTime + ", duration=" + duration + '}';
+        return "Test{" + "examCode=" + examCode + ", questions=" + questions + ", examEndTime=" + examEndTime + ", duration=" + duration + '}';
     }
 }

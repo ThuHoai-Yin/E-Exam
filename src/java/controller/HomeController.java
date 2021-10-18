@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import model.Authentication;
-import model.Test;
+import model.Exam;
 import utils.DataAccessObject;
 
 @WebServlet(name = "Home", urlPatterns = {"/home"})
@@ -24,14 +24,14 @@ public class HomeController extends HttpServlet {
         if (response.getStatus() != 302) {
             Timestamp current = new Timestamp(System.currentTimeMillis());
             HttpSession session = request.getSession();
-            Test test = (Test) session.getAttribute("Test");
+            Exam exam = (Exam) session.getAttribute("Exam");
 
-            if (test != null) {
-                if (test.getExamEndTime().after(current)) {
+            if (exam != null) {
+                if (exam.getExamEndTime().after(current)) {
                     response.sendRedirect("exam");
                     return;
                 } else {
-                    session.setAttribute("Test", null);
+                    session.setAttribute("Exam", null);
                 }
             }
 
@@ -42,30 +42,29 @@ public class HomeController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        String testCode = request.getParameter("testCode");
-        System.out.println(testCode);
-        List<Test> result = DataAccessObject.getTest(testCode);
-        if (result.size() > 0) {            
-            Test test = DataAccessObject.getTest(testCode).get(0);
+        String examCode = request.getParameter("examCode");
+        System.out.println(examCode);
+        List<Exam> result = DataAccessObject.getExam(examCode);
+        if (result.size() > 0) {
             Authentication auth = (Authentication) session.getAttribute("Auth");
-            if (DataAccessObject.initRecord(testCode, auth.getID())) {
+            if (DataAccessObject.initRecord(examCode, auth.getID())) {
+                Exam exam = DataAccessObject.getExam(examCode).get(0);
                 Timestamp current = new Timestamp(System.currentTimeMillis());
-
                 Calendar cal = Calendar.getInstance();
                 cal.setTimeInMillis(current.getTime());
-                cal.add(Calendar.SECOND, test.getDuration());
+                cal.add(Calendar.SECOND, exam.getDuration());
                 Timestamp later = new Timestamp(cal.getTime().getTime());
-                test.setExamEndTime(later);
-                test.shuffle();
-                session.setAttribute("Test", test);
+                exam.setExamEndTime(later);
+                exam.shuffle();
+                session.setAttribute("Exam", exam);
                 response.sendRedirect("exam");
             } else {
-                request.setAttribute("Msg", "You have already taken this test");
+                request.setAttribute("Msg", "You have already taken this exam");
                 request.setAttribute("Detail", "Please contact your teacher for more information");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
             }
         } else {
-            request.setAttribute("Msg", "This test code doesn't exist");
+            request.setAttribute("Msg", "This exam code doesn't exist");
             request.setAttribute("Detail", "Please check and try again");
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }

@@ -11,7 +11,7 @@ import model.Answer;
 import model.Authentication;
 import model.Bank;
 import model.Question;
-import model.Test;
+import model.Exam;
 import org.apache.catalina.tribes.util.Arrays;
 
 public class DataAccessObject {
@@ -90,41 +90,41 @@ public class DataAccessObject {
         }
     }
 
-    public static List<Test> getTest(String testCode) {
-        List<Test> tests = new ArrayList<>();
+    public static List<Exam> getExam(String examCode) {
+        List<Exam> exams = new ArrayList<>();
         try {
             try (Connection conn = DBContext.getConnection()) {
-                String query = "select * from testTbl tt \n"
-                        + "inner join testDetailTbl tdt on tt.testCode = tdt.testCode \n"
-                        + "inner join questionTbl qt on qt.questionID = tdt.questionID \n"
+                String query = "select * from examTbl et \n"
+                        + "inner join examDetailTbl edt on et.examCode = edt.examCode \n"
+                        + "inner join questionTbl qt on qt.questionID = edt.questionID \n"
                         + "inner join answerTbl at2 on qt.questionID = at2.questionID\n"
-                        + (testCode != null ? "where tt.testCode = ?\n" : "")
-                        + "order by tt.testCode, qt.questionID";
+                        + (examCode != null ? "where et.examCode = ?\n" : "")
+                        + "order by et.examCode, qt.questionID";
                 try (PreparedStatement stm = conn.prepareStatement(query)) {
-                    if (testCode != null) {
-                        stm.setString(1, testCode);
+                    if (examCode != null) {
+                        stm.setString(1, examCode);
                     }
                     ResultSet resset = stm.executeQuery();
-                    Test test = null;
+                    Exam exam = null;
                     Question question = null;
                     Answer answer = null;
                     int maxChoose = 0;
                     while (resset.next()) {
-                        testCode = resset.getString("testCode");
+                        examCode = resset.getString("examCode");
                         int questionID = resset.getInt("questionID");
                         int answerID = resset.getInt("answerID");
-                        if (test == null || !test.getTestCode().equals(testCode)) {
-                            if (test != null) {
-                                tests.add(test);
+                        if (exam == null || !exam.getExamCode().equals(examCode)) {
+                            if (exam != null) {
+                                exams.add(exam);
                             }
-                            test = new Test(testCode, new ArrayList<>(), null, resset.getInt("duration"));
+                            exam = new Exam(examCode, new ArrayList<>(), null, resset.getInt("duration"));
                             question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
                             answer = new Answer(answerID, resset.getString("answerContent"));
                             maxChoose = 0;
                         }
                         if (question.getQuestionID() != questionID) {
                             question.setMaxChoose(maxChoose);
-                            test.getQuestions().add(question);
+                            exam.getQuestions().add(question);
                             question = new Question(questionID, resset.getString("questionContent"), resset.getInt("mark"), 0, new ArrayList<>());
                             maxChoose = 0;
                         }
@@ -134,18 +134,18 @@ public class DataAccessObject {
                             maxChoose++;
                         }
                     }
-                    if (test == null) {
-                        return tests;
+                    if (exam == null) {
+                        return exams;
                     }
                     question.setMaxChoose(maxChoose);
-                    test.getQuestions().add(question);
-                    tests.add(test);
+                    exam.getQuestions().add(question);
+                    exams.add(exam);
                 }
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage() + "\n" + ex.getStackTrace());
         }
-        return tests;
+        return exams;
     }
 
     public static List<Bank> getBank(int bankID) {
@@ -205,42 +205,41 @@ public class DataAccessObject {
         return banks;
     }
 
-    public static boolean initRecord(String testCode, int studentID) {
+    public static boolean initRecord(String examCode, int studentID) {
         try {
             try (Connection conn = DBContext.getConnection()) {
-                String query = "select * from recordTbl where testCode = ? and studentID = ?";
+                String query = "select * from recordTbl where examCode = ? and studentID = ?";
                 try (PreparedStatement stm = conn.prepareStatement(query)) {
-                    stm.setString(1, testCode);
+                    stm.setString(1, examCode);
                     stm.setInt(2, studentID);
                     ResultSet resset = stm.executeQuery();
                     if (resset.next()) {
-
                         return false; //Record is existed  
                     }
                 }
-                query = "insert into recordTbl(testCode, studentID, examDate) values (?, ?, getDate())";
+                query = "insert into recordTbl(examCode, studentID, examDate) values (?, ?, getDate())";
                 try (PreparedStatement stm = conn.prepareStatement(query)) {
-                    stm.setString(1, testCode);
+                    stm.setString(1, examCode);
                     stm.setInt(2, studentID);
                     return stm.executeUpdate() > 0;
                 }
             }
         } catch (SQLException ex) {
-
+            System.out.println(ex.getMessage());
         }
         return false;
     }
 
-    public static boolean saveRecord(String testCode, int studentID, Test test, int selectedCount) {
+    public static boolean saveRecord(String examCode, int studentID, Exam exam, int selectedCount) {
         try {
             try (Connection conn = DBContext.getConnection()) {
                 String query = "update recordTbl \n"
                         + "set dateSummited = getdate()\n"
                         + "output inserted.recordID\n"
-                        + "where testCode = ? and studentID = ? and dateSummited is null";
+                        + "where examCode = ? and studentID = ? and dateSummited is null";
                 int recordID;
                 try (PreparedStatement stm = conn.prepareStatement(query)) {
-                    stm.setString(1, testCode);
+                    stm.setString(1, examCode);
                     stm.setInt(2, studentID);
                     ResultSet resset = stm.executeQuery();
                     if (!resset.next()) {
@@ -261,7 +260,7 @@ public class DataAccessObject {
                 query += "(?,?)";
                 try (PreparedStatement stm = conn.prepareStatement(query)) {
                     int counter = 1;
-                    for (Question q : test.getQuestions()) {
+                    for (Question q : exam.getQuestions()) {
                         for (Answer a : q.getAnswers()) {
                             if (a.isSelected()) {
                                 stm.setInt(counter, recordID);
