@@ -13,8 +13,8 @@
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
 			</svg>
 			<div>
-				<p class="font-bold text-gray-600 text-5xl text-center">${requestScope.Msg}</p>
-				<p class="font-light text-gray-500 text-xl text-center mt-2">${requestScope.Detail}</p>
+				<p class="font-bold text-gray-600 text-5xl text-center">${requestScope.msg}</p>
+				<p class="font-light text-gray-500 text-xl text-center mt-2">${requestScope.detail}</p>
 			</div>
 			<a href="home" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Take Me Home </a>
 		</div>

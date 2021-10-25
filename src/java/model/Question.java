@@ -1,18 +1,17 @@
 package model;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Question {
     private int questionID;
     private String content;
-    private int mark;
     private int maxChoose;
     private List<Answer> answers;
 
-    public Question(int questionID, String content, int mark, int maxChoose, List<Answer> answers) {
+    public Question(int questionID, String content, int maxChoose, List<Answer> answers) {
         this.questionID = questionID;
         this.content = content;
-        this.mark = mark;
         this.maxChoose = maxChoose;
         this.answers = answers;
     }
@@ -48,17 +47,13 @@ public class Question {
     public void setAnswers(List<Answer> answers) {
         this.answers = answers;
     } 
-
-    public int getMark() {
-        return mark;
-    }
-
-    public void setMark(int mark) {
-        this.mark = mark;
+    
+    public void shuffle() {
+        Collections.shuffle(this.answers);
     }
 
     @Override
     public String toString() {
-        return "Question{" + "questionID=" + questionID + ", content=" + content + ", mark=" + mark + ", maxChoose=" + maxChoose + ", answers=" + answers + '}';
+        return "Question{" + "questionID=" + questionID + ", content=" + content + ",maxChoose=" + maxChoose + ", answers=" + answers + '}';
     }
 }

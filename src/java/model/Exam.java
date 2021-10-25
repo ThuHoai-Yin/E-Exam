@@ -8,12 +8,16 @@ public class Exam {
 
     private String examCode;
     private List<Question> questions;
+    private Timestamp openDate;
+    private Timestamp closeDate;
     private Timestamp examEndTime;
     private int duration;
 
-    public Exam(String examCode, List<Question> questions, Timestamp examEndTime, int duration) {
+    public Exam(String examCode, List<Question> questions, Timestamp openDate, Timestamp closeDate, Timestamp examEndTime, int duration) {
         this.examCode = examCode;
         this.questions = questions;
+        this.openDate = openDate;
+        this.closeDate = closeDate;
         this.examEndTime = examEndTime;
         this.duration = duration;
     }
@@ -32,6 +36,22 @@ public class Exam {
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+    }
+
+    public Timestamp getOpenDate() {
+        return openDate;
+    }
+
+    public void setOpenDate(Timestamp openDate) {
+        this.openDate = openDate;
+    }
+
+    public Timestamp getCloseDate() {
+        return closeDate;
+    }
+
+    public void setCloseDate(Timestamp closeDate) {
+        this.closeDate = closeDate;
     }
 
     public Timestamp getExamEndTime() {

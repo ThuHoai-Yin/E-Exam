@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -10,13 +11,13 @@ import javax.servlet.http.HttpSession;
 import model.User;
 import utils.DataAccessObject;
 
-@WebServlet(name = "Login", urlPatterns = {"/login"})
-public class LoginController extends HttpServlet {
+@WebServlet(name = "Admin", urlPatterns = {"/admin"})
+public class AdminController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+        request.getRequestDispatcher("admin.jsp").forward(request, response);
     }
 
     @Override
@@ -25,17 +26,17 @@ public class LoginController extends HttpServlet {
         HttpSession session = request.getSession();
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        String roleName = request.getParameter("roleName");
-        User user = DataAccessObject.login(username, password, roleName);
+        User user = DataAccessObject.login(username, password, "admin");
         if (user == null) {
             request.setAttribute("errMsg", " - Username or Password is invalid.");
             request.setAttribute("lastUser", username);
-            request.setAttribute("userRole", roleName);
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            Object obj = request.getServletContext().getAttribute("loginFailureTimes");         
+            int loginFailureTimes = obj != null ? (Integer) obj : 0;
+            request.getServletContext().setAttribute("loginFailureTimes", loginFailureTimes + 1);
+            request.getRequestDispatcher("admin.jsp").forward(request, response);
         } else {
             session.setAttribute("user", user);
             response.sendRedirect("home");
         }
-
     }
 }

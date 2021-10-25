@@ -21,6 +21,10 @@
         <error-code>404</error-code>
         <location>/error</location>
     </error-page>
+    <error-page>
+        <error-code>418</error-code>
+        <location>/error</location>
+    </error-page>
     <welcome-file-list>
         <welcome-file>home</welcome-file>
     </welcome-file-list>

@@ -1,29 +1,36 @@
+create table roleTbl(
+	roleID tinyint identity(1,1) primary key,
+	roleName varchar(20) not null,
+	canTakeExam bit not null,
+    canManageAccount bit not null,
+    canManageBank bit not null,
+    canManageExam bit not null,
+)
+
 create table userTbl(
-	userID int identity(1,1) primary key,
-	username varchar(20) not null,
-	userRole varchar(10) not null,
+	userID int identity(1,1) primary key,	
+	username varchar(20) not null,	
+	fullname nvarchar(30) not null,
+	email varchar(40) not null,
+	roleID tinyint foreign key references roleTbl(roleID) not null,
 	hashedPassword varbinary(64) not null,
 	salt varbinary(32) not null,
 )
 
-create table userDetailTbl(
-	userID int primary key references userTbl(userID),
-	fullname nvarchar(30) not null,
-	email varchar(40) not null,
-)
-
 create table bankTbl(
 	bankID int identity(1,1) primary key,
-	courseCode varchar(10) not null,
-	creatorID int foreign key references userTbl(userID) not null,
+	courseName nvarchar(50) not null,
+	bankName nvarchar(50) not null,
+	creatorID int not null,
 	dateCreated datetime not null,
+	constraint bT_cI_FK foreign key (creatorID) references userTbl(userID) on delete cascade, 
 )
 
 create table questionTbl(
 	questionID int identity(1,1) primary key,
-	bankID int foreign key references bankTbl(bankID) not null,
-	mark tinyint not null,
+	bankID int,
 	questionContent nvarchar(MAX) not null,
+	constraint qT_bI_FK foreign key (bankID) references bankTbl(bankID) on delete set null,
 )
 
 create table answerTbl(
@@ -35,30 +42,46 @@ create table answerTbl(
 
 create table examTbl(
 	examCode varchar(25) primary key,
-	bankID int foreign key references bankTbl(bankID) not null,
-	startDate datetime,
-	endDate datetime,
+	examName nvarchar(50) not null,
+	openDate datetime,
+	closeDate datetime,
+	creatorID int not null,
 	duration smallint check (duration > 0),
-	constraint timeCS check (startDate is null or endDate is null or startDate < endDate)	
+	constraint eT_cI_FK foreign key (creatorID) references userTbl(userID) on delete cascade, 
+	constraint eT_CK check (openDate is null or closeDate is null or openDate < closeDate)	
 )
 
 create table examDetailTbl(
-	examCode varchar(25) foreign key references examTbl(examCode) not null,
-	questionID int foreign key references questionTbl(questionID) not null,
-	constraint tAll primary key (examCode, questionID)
+	examCode varchar(25) not null,
+	questionID int not null, 
+	constraint eD_eC_FK foreign key (examCode) references examTbl(examCode) on delete cascade, 
+	constraint eD_qI_FK foreign key (questionID) references questionTbl(questionID) on delete cascade, 
+	constraint eD_PK primary key (examCode, questionID)
 )
 
 create table recordTbl(
-	examCode varchar(25) foreign key references examTbl(examCode) not null,
-	studentID int foreign key references userTbl(userID) not null,
+	examCode varchar(25) not null,
+	takerID int not null,
 	recordID int identity(1, 1) unique not null,
 	examDate datetime not null,
-	dateSummited datetime,
-	constraint rPK primary key(examCode, studentID)
+	dateSubmitted datetime,
+	constraint rT_eC_FK foreign key (examCode) references examTbl(examCode) on delete cascade,
+	constraint rT_tI_FK foreign key (takerID) references userTbl(userID),
+	constraint rT_PK primary key(examCode, takerID)	
 )
 
 create table recordDetailTbl(
-	recordID int foreign key references recordTbl(recordID) not null,
-	answerID int foreign key references answerTbl(answerID) not null,
+	recordID int not null,
+	answerID int foreign key references answerTbl(answerID) not null,	
+	constraint rIFK foreign key (recordID) references recordTbl(recordID) on delete cascade,
 	constraint rDPK primary key(recordID, answerID)
 )
+
+declare top @numOfQuestions @examcode varchar(25) = 'qbj22mhybc'
+declare @numOfQuestions int = 1
+insert into examDetailTbl 
+select @examcode, qt.questionID 
+from questionTbl qt 
+where qt.bankID = 17
+order by rand()
+limit @numOfQuestions 

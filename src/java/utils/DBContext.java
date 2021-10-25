@@ -9,13 +9,13 @@ import java.sql.SQLException;
 public class DBContext {
 
     private static final String hostname = "localhost";
-    private static final int serverport = 1433;
-    private static final String dbName = "prjassignment";
+    private static final int serverPort = 1433;
+    private static final String dbName = "e-exam";
     private static final String username = "sa";
     private static final String password = "Abc@12345678";
     private static final String driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
-    private static final String connectionStr = "jdbc:sqlserver://" + hostname + ":" + serverport + ";databaseName=" + dbName;
+    private static final String connectionStr = "jdbc:sqlserver://" + hostname + ":" + serverPort + ";databaseName=" + dbName;
 
     
     private static HikariConfig config = new HikariConfig();

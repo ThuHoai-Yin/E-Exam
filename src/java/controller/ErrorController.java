@@ -16,15 +16,21 @@ public class ErrorController extends HttpServlet {
         int statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
         switch (statusCode) {
             case 403:                
-                request.setAttribute("Code", "403");
-                request.setAttribute("Msg", "Forbidden");
-                request.setAttribute("Detail", "Your role cannot access this content");
+                request.setAttribute("code", "403");
+                request.setAttribute("msg", "Forbidden");
+                request.setAttribute("detail", "Your role cannot access this content");
                 request.getRequestDispatcher("httperror.jsp").forward(request, response);
                 break;
             case 404:
-                request.setAttribute("Code", "404");
-                request.setAttribute("Msg", "Not Found");
-                request.setAttribute("Detail", "Please check URL in address bar and try again");
+                request.setAttribute("code", "404");
+                request.setAttribute("msg", "Not Found");
+                request.setAttribute("detail", "Please check URL in address bar and try again");
+                request.getRequestDispatcher("httperror.jsp").forward(request, response);
+                break;
+            case 418:
+                request.setAttribute("code", "418");
+                request.setAttribute("msg", "I'm a teapot");
+                request.setAttribute("detail", ":)");
                 request.getRequestDispatcher("httperror.jsp").forward(request, response);
                 break;
         }

@@ -10,6 +10,7 @@ import javax.crypto.spec.PBEKeySpec;
 public class Crypto {
 
     private static final SecureRandom random = new SecureRandom();
+    private static final String charPool = "abcdefghijkmnopqrstuvwxyz0123456789";
     private static SecretKeyFactory factory = null;
 
     static {
@@ -17,6 +18,13 @@ public class Crypto {
             factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         } catch (NoSuchAlgorithmException ex) {
         }
+    }
+    
+    public static String getRandomString(int length) {
+        String result = "";
+        for (int i = 0; i < length; i++)
+            result += charPool.charAt(random.nextInt(charPool.length()));
+        return result;
     }
     
     public static byte[] getSalt() {

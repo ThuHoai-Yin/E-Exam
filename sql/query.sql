@@ -44,3 +44,8 @@ inner join recordDetailTbl rdt on
 	
 drop table #temp1
 drop table #temp2
+
+delete from questionTbl
+where bankID is null and questionID not in (
+	select questionID from examDetailTbl
+)
