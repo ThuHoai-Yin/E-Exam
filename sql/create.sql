@@ -35,10 +35,11 @@ create table questionTbl(
 
 create table answerTbl(
 	answerID int identity(1,1) primary key,
-	questionID int foreign key references questionTbl(questionID) not null,
+	questionID int not null,
 	answerContent nvarchar(100) not null,
 	isCorrect bit not null,
-)
+	constraint qT_aI_FK foreign key (questionID) references questionTbl(questionID) on delete cascade, 
+) 
 
 create table examTbl(
 	examCode varchar(25) primary key,
@@ -77,11 +78,9 @@ create table recordDetailTbl(
 	constraint rDPK primary key(recordID, answerID)
 )
 
-declare top @numOfQuestions @examcode varchar(25) = 'qbj22mhybc'
-declare @numOfQuestions int = 1
+insert into examTbl(examCode, examName, openDate, closeDate, creatorID, duration) values (?,?,?,?,?,?)
 insert into examDetailTbl 
-select @examcode, qt.questionID 
+select top ? ?, qt.questionID 
 from questionTbl qt 
-where qt.bankID = 17
+where qt.bankID = ?
 order by rand()
-limit @numOfQuestions 

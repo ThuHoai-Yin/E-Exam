@@ -6,8 +6,9 @@
 
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>Exam</title>
+        <title>Take Exam</title>
         <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
+        <link href="https://unpkg.com/@tailwindcss/custom-forms@0.2.1/dist/custom-forms.min.css" rel="stylesheet" />
     </head>
 
     <body>
@@ -45,7 +46,7 @@
                             </div>
                             <div id="answer-container-${qCount.count}"
                                  class="pt-4 px-6 flex flex-col gap-y-3 border-t-gray-500 border-t-2">
-                                <c:forEach var="answer" items="${question.getAnswers()}" varStatus="aCount">
+                                <c:forEach var="answer" items="${question.getAnswers()}">
                                     <div>
                                         <label class="inline-flex items-center w-full">
                                             <input
@@ -55,7 +56,7 @@
                                                                 document.querySelectorAll('#answer-container-<c:out value="${qCount.count}" /> input:not(:checked)'), this,
                                                 <c:out value="${question.getMaxChoose()}" />)"
                                                 type="checkbox"
-                                                name="answerID-${answer.getAnswerID()}" />
+                                                name="answer.${answer.getAnswerID()}" />
                                             <span class="ml-2 text-gray-700">${answer.getContent()}</span>
                                         </label>
                                     </div>
@@ -64,7 +65,7 @@
                         </div>
                     </c:forEach>
                     <button type="submit" id="submitBtn"
-                            class="w-32 h-12 bg-green-500 text-white font-semibold text-xl rounded-sm">Submit</button>
+                            class="w-32 h-12 rounded-md text-xl font-medium border-0 focus:outline-none focus:ring transition text-white bg-blue-500 hover:bg-blue-600 active:bg-blue-700 focus:ring-blue-300">Submit</button>
                 </form>
             </c:if>
         </main>
@@ -89,10 +90,11 @@
                 }
             }, 1000);
             function checkboxOnChange(checkedlist, uncheckedlist, el, maxchoose) {
-                let b = checkedlist.length + el.checked ? 1 : 0 >= maxchoose;
+                let b = (checkedlist.length + (el.checked ? 1 : 0)) > maxchoose;
                 uncheckedlist.forEach((element) => {
-                    if (element != el) {
+                    if (element !== el) {
                         element.disabled = b;
+                        element.style.backgroundColor = b ? 'rgb(209, 213, 219)' : '';
                     }
                 });
             }

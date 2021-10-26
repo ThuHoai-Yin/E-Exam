@@ -22,8 +22,10 @@ public class ManageExamController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
         request.setAttribute("banks", DataAccessObject.getBank(-1));
-        request.setAttribute("exams", DataAccessObject.getExam(null));
+        request.setAttribute("exams", DataAccessObject.getExam(null, user.getUserID()));
         request.getRequestDispatcher("manageExam.jsp").forward(request, response);
     }
 
@@ -71,7 +73,7 @@ public class ManageExamController extends HttpServlet {
                 }
             case "remove":
                 String examCode = request.getParameter("examCode");
-                if (!DataAccessObject.removeExam(examCode)) {
+                if (!DataAccessObject.removeExam(examCode, user.getUserID())) {
 
                 }
                 break;

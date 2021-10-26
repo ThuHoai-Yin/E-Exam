@@ -10,14 +10,16 @@ public class Exam {
     private List<Question> questions;
     private Timestamp openDate;
     private Timestamp closeDate;
+    private String creatorFullName;
     private Timestamp examEndTime;
     private int duration;
 
-    public Exam(String examCode, List<Question> questions, Timestamp openDate, Timestamp closeDate, Timestamp examEndTime, int duration) {
+    public Exam(String examCode, List<Question> questions, Timestamp openDate, Timestamp closeDate, String creatorFullName, Timestamp examEndTime, int duration) {
         this.examCode = examCode;
         this.questions = questions;
         this.openDate = openDate;
         this.closeDate = closeDate;
+        this.creatorFullName = creatorFullName;
         this.examEndTime = examEndTime;
         this.duration = duration;
     }
@@ -54,6 +56,14 @@ public class Exam {
         this.closeDate = closeDate;
     }
 
+    public String getCreatorFullName() {
+        return creatorFullName;
+    }
+
+    public void setCreatorFullName(String creatorFullName) {
+        this.creatorFullName = creatorFullName;
+    }
+    
     public Timestamp getExamEndTime() {
         return examEndTime;
     }

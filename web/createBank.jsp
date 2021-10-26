@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>Home</title>
+        <title>Create Bank</title>
         <link href="static/styles.css" rel="stylesheet">
         <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
         <link href="https://unpkg.com/@tailwindcss/custom-forms@0.2.1/dist/custom-forms.min.css" rel="stylesheet" />
@@ -15,15 +15,19 @@
         <main class="pt-16 flex flex-col items-center">
             <form action="createBank" method="post" id="form" method="post" class="my-10 flex flex-col items-center">
                 <div class="w-full p-5 bg-white flex flex-col gap-y-3 mb-3">
-                    <h1 class="font-semibold text-center text-xl">Create bank</h1>
-                    <input type="txt" name="bankName" placeholder="Enter bank name" class="mt-2 form-input w-full text-center"/>
-                    <input type="txt" name="courseName" placeholder="Enter course name" class="mt-2 form-input w-full text-center"/>
+                    <h1 class="font-semibold text-center text-xl">Create New Bank</h1>
+                    <input type="txt" name="bankName" placeholder="Enter bank name" class="mt-2 form-input w-full text-center" required/>
+                    <input type="txt" name="courseName" placeholder="Enter course name" class="mt-2 form-input w-full text-center" required/>
                 </div>
                 <div id="question-container" class="question flex flex-col gap-y-3" style="width: 60rem">                    
                 </div>
                 <div class="flex flex-1 justify-center w-full relative mt-3">
+                    <a href="manageBank" class="absolute left-0" id="redirect">
+                        <button type="submit" form="redirect"
+                                class="w-28 p-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-red-600 bg-red-50 border-red-200 hover:bg-red-100 active:bg-red-200 focus:ring-red-300">Back</button>
+                    </a>   
                     <button onclick="addQuestion(this)" type="button"
-                            class="p-2 rounded-full bg-white hover:opacity-80">
+                                   class="p-2 rounded-full bg-white hover:opacity-80">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
@@ -42,7 +46,7 @@
                                 1
                             </span>
                         </div>
-                        <textarea class="h-24 resize-none form-textarea font-bold w-full mb-1 mr-14" placeholder="Enter question content"></textarea>
+                        <textarea class="h-24 resize-none form-textarea font-bold w-full mb-1 mr-14" placeholder="Enter question content" required></textarea>
                     </div>
                     <div class="answer-container pt-4 pl-6 pr-3 flex flex-col gap-y-3 border-t-gray-500 border-t-2 w-full">                       
                     </div>
@@ -68,7 +72,7 @@
                         onchange=""
                         type="checkbox"
                         />
-                    <input type="txt" class="form-input text-gray-700 ml-2 w-full" placeholder="Enter answer content"/>
+                    <input type="txt" class="form-input text-gray-700 ml-2 w-full" placeholder="Enter answer content" required/>
                     <button onclick="removeAnswer(this)"
                             type="button"
                             class="p-1 rounded-full bg-transparent hover:opacity-80">

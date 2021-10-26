@@ -26,6 +26,9 @@ public class AdminController extends HttpServlet {
         HttpSession session = request.getSession();
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        
+        //Validation
+        
         User user = DataAccessObject.login(username, password, "admin");
         if (user == null) {
             request.setAttribute("errMsg", " - Username or Password is invalid.");

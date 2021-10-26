@@ -20,24 +20,24 @@
             <div class="mt-10 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                     <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <table class="table-fixed divide-y divide-gray-200" style="width: 90rem">
+                        <table class="table-auto divide-y divide-gray-200" style="min-width: 70rem;">
                             <thead class="bg-gray-50">
                             <th scope="col"
-                                class="w-1/12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 ID</th>
                             <th scope="col"
-                                class="w-2/12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Username</th>
                             <th scope="col"
-                                class="w-3/12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Full Name</th>
                             <th scope="col"
-                                class="w-3/12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Email</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Role</th>
-                            <th scope="col" style="width: 10%"></th>
+                            <th scope="col"></th>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <c:if test="${not empty accounts}">
@@ -49,7 +49,7 @@
                                             <td class="px-6 py-4 whitespace-nowrap">${acc.getEmail()}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">${acc.getRole().getRoleName()}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap flex justify-end gap-x-5">
+                                            <td class="px-6 py-4 whitespace-nowrap flex justify-end gap-x-3">
                                                 <a class="cursor-pointer text-lg text-blue-500 hover:text-blue-700"
                                                    onclick="editAccount(<c:out value=" ${acc.getUserID()}" />,
                                                    <c:out value="'${acc.getUsername()}'" />,
@@ -92,8 +92,7 @@
                         </div>
                         <h3 class="text-lg leading-6 font-medium text-gray-900">Warning!</h3>
                         <div class="mt-2 px-7 py-3">
-                            <p class="text-sm text-gray-500" id="remove-msg">Do you want to remove ""?<br />
-                                This action also removes all related information</p>
+                            <p class="text-sm text-gray-500" id="remove-msg"></p>
                         </div>
                         <form action="manageAccount" method="post"
                               class="items-center px-4 py-3 flex flex-1 gap-5 justify-center">

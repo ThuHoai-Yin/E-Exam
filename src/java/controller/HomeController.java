@@ -29,7 +29,7 @@ public class HomeController extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         String examCode = request.getParameter("examCode");
-        List<Exam> result = DataAccessObject.getExam(examCode);
+        List<Exam> result = DataAccessObject.getExam(examCode, -1);
         if (!result.isEmpty()) {
             Exam exam = result.get(0);
             Timestamp current = new Timestamp(System.currentTimeMillis());

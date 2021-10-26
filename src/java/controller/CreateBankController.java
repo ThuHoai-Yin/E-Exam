@@ -10,11 +10,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import javafx.util.Pair;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,13 +25,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import model.Answer;
-import model.Bank;
-import model.Question;
 import model.User;
-import org.apache.catalina.tribes.util.Arrays;
 import utils.DBContext;
-import utils.DataAccessObject;
 
 @WebServlet(name = "CreateBank", urlPatterns = {"/createBank"})
 public class CreateBankController extends HttpServlet {
@@ -47,6 +45,26 @@ public class CreateBankController extends HttpServlet {
         String bankName = request.getParameter("bankName");
         String courseName = request.getParameter("courseName");
 
+        Enumeration<String> e = request.getParameterNames();
+        Stream<String> stream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+                new Iterator<String>() {
+            public String next() {
+                return e.nextElement();
+            }
+
+            public boolean hasNext() {
+                return e.hasMoreElements();
+            }
+        },
+                Spliterator.ORDERED), false);
+        if (!stream.anyMatch(el -> el.startsWith("question")) || !stream.anyMatch(el -> el.startsWith("answer"))) {            
+            request.setAttribute("msg", "Invalid bank format!");
+            request.setAttribute("detail", "Each bank must have questions and each question must have answers");
+            request.setAttribute("backURL", "manageBank");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+        
         try (Connection conn = DBContext.getConnection()) {
             String query = "insert into bankTbl(bankName, courseName, creatorID, dateCreated)\n"
                     + "output inserted.bankID\n"
@@ -69,6 +87,12 @@ public class CreateBankController extends HttpServlet {
                     questions.put(parentId, entry.getValue()[0]);
                 }
             }
+
+            if (questions.isEmpty()) {
+                response.sendRedirect("manageBank");
+                return;
+            }
+
             query = "insert into questionTbl(bankID, questionContent)\n"
                     + "output inserted.questionId\n"
                     + "values ";
@@ -102,14 +126,18 @@ public class CreateBankController extends HttpServlet {
                 }
             }
 
+            if (answers.isEmpty()) {
+                response.sendRedirect("manageBank");
+                return;
+            }
+
             query = "insert into answerTbl(questionID, answerContent, isCorrect)\n"
                     + "values ";
             for (int i = 1; i < answers.size(); i++) {
                 query += "(?,?,?),";
             }
             query += "(?,?,?)";
-            
-            
+
             try (PreparedStatement stm = conn.prepareStatement(query)) {
                 int counter = 1;
                 for (Pair<Integer, Pair<String, Boolean>> entry : answers) {
@@ -117,11 +145,12 @@ public class CreateBankController extends HttpServlet {
                     stm.setString(counter++, entry.getValue().getKey());
                     stm.setBoolean(counter++, entry.getValue().getValue());
                 }
-                int result = stm.executeUpdate();
+                stm.executeUpdate();
             }
 
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage() + Arrays.toString(ex.getStackTrace()));
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
         response.sendRedirect("manageBank");
     }

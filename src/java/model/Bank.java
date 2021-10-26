@@ -7,14 +7,16 @@ public class Bank {
     private int bankID;
     private String bankName;
     private String courseName;
+    private int creatorID;
     private String creatorFullName;
     private List<Question> questions;
     private Timestamp dateCreated;
 
-    public Bank(int bankID, String bankName, String courseName, String creatorFullName, List<Question> questions, Timestamp dateCreated) {
+    public Bank(int bankID, String bankName, String courseName, int creatorID, String creatorFullName, List<Question> questions, Timestamp dateCreated) {
         this.bankID = bankID;
         this.bankName = bankName;
         this.courseName = courseName;
+        this.creatorID = creatorID;
         this.creatorFullName = creatorFullName;
         this.questions = questions;
         this.dateCreated = dateCreated;
@@ -42,6 +44,14 @@ public class Bank {
 
     public void setCourseName(String courseName) {
         this.courseName = courseName;
+    }
+
+    public int getCreatorID() {
+        return creatorID;
+    }
+
+    public void setCreatorID(int creatorID) {
+        this.creatorID = creatorID;
     }
 
     public String getCreatorFullName() {

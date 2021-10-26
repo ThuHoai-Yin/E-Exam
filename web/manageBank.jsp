@@ -1,3 +1,4 @@
+<%@page import="java.text.SimpleDateFormat"%>
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -14,37 +15,39 @@
 
     <body>
         <jsp:include page="header.jsp" />
+        <c:set var="user" value="${sessionScope.user}" />
         <c:set var="banks" value="${requestScope.banks}" />
         <main class="pt-16 flex flex-col items-center justify-center">
             <div class="mt-10 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                     <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <table class="table-fixed divide-y divide-gray-200" style="width: 90rem">
+                        <table class="table-auto divide-y divide-gray-200" style="min-width: 70rem;">
                             <thead class="bg-gray-50">
                             <th scope="col"
-                                class="w-1/12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 ID</th>
                             <th scope="col"
-                                class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Name</th>
                             <th scope="col"
-                                class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Course</th>
                             <th scope="col"
-                                class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Creator</th>
                             <th scope="col"
-                                class="w-2/12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Num of Questions</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Date Created</th>
-                            <th scope="col" style="width: 10%"></th>
+                            <th scope="col"></th>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <c:if test="${not empty banks}">
                                     <c:forEach var="bank" items="${banks}">
                                         <tr>
+                                            <c:set var="temp" value="${bank.getDateCreated()}"/>
                                             <td class="px-6 py-4 whitespace-nowrap">${bank.getBankID()}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">${bank.getBankName()}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">${bank.getCourseName()}</td>
@@ -52,11 +55,17 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">${bank.getQuestions().size()}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">${bank.getDateCreated()}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap flex justify-end gap-x-5">
-                                                <a class="cursor-pointer text-lg text-red-500 hover:text-red-700"
-                                                   onclick="removeBank(<c:out value="'${bank.getBankID()}'"/>, <c:out value="'${bank.getBankName()}'"/>)">Remove</a>
+                                            <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("hh:mm dd/MM/yyyy").format(pageContext.getAttribute("temp"))%></td>
+                                            <c:remove var="temp" scope="page"/>
+                                            <td class="px-6 py-4 whitespace-nowrap flex justify-end gap-x-3">
+                                                <a <c:if test="${bank.getCreatorID() == user.getUserID()}">
+                                                        class="cursor-pointer text-lg text-red-500 hover:text-red-700"
+                                                        onclick="removeBank(<c:out value="'${bank.getBankID()}'"/>, <c:out value="'${bank.getBankName()}'"/>)"                                                       
+                                                    </c:if>
+                                                    <c:if test="${bank.getCreatorID() != user.getUserID()}">
+                                                        class="cursor-not-allowed text-lg text-gray-500"                                                    
+                                                    </c:if>
+                                                    >Remove</a>
                                             </td>
                                         </tr>
                                     </c:forEach>
@@ -64,7 +73,7 @@
                                 <c:if test="${empty banks}">
                                     <tr>
                                         <td class="py-4 whitespace-nowrap text-center text-xl font-medium text-gray-500 uppercase"
-                                            colspan="6">No Data</td>
+                                            colspan="7">No Data</td>
                                     </tr>
                                 </c:if>
                             </tbody>
@@ -92,9 +101,7 @@
                         </div>
                         <h3 class="text-lg leading-6 font-medium text-gray-900">Warning!</h3>
                         <div class="mt-2 px-7 py-3">
-                            <p class="text-sm text-gray-500" id="remove-msg">Do you want to remove ""?<br />
-                                This action also removes all related records
-                            </p>
+                            <p class="text-sm text-gray-500" id="remove-msg"></p>
                         </div>
                         <form action="manageBank" method="post"
                               class="items-center px-4 py-3 flex flex-1 gap-5 justify-center">

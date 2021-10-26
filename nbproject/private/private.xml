@@ -3,39 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/web/takeExam.jsp</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/controller/ErrorController.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/utils/DBContext.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/utils/SecurityConfig.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/utils/Crypto.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/web/admin.jsp</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/web/header.jsp</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/web/success.jsp</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/web/WEB-INF/web.xml</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/web/httperror.jsp</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/web/manageAccount.jsp</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/controller/LoginController.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/model/Role.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/model/Answer.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/controller/AdminController.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/web/manageExam.jsp</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/web/error.jsp</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/web/home.jsp</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/web/login.jsp</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/filter/RootFilter.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/model/User.java</file>
             <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/controller/TakeExamController.java</file>
             <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/controller/ManageBankController.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/model/Question.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/utils/DataAccessObject.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/controller/ManageAccountController.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/model/Bank.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/web/manageBank.jsp</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/model/Exam.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/utils/Test.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/controller/HomeController.java</file>
             <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/controller/ManageExamController.java</file>
-            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/utils/XSSRequestWrapper.java</file>
+            <file>file:/mnt/Workspace/Source/Projects/E-Exam/src/java/controller/CreateBankController.java</file>
         </group>
     </open-files>
 </project-private>

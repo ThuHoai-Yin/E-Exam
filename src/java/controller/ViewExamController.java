@@ -1,10 +1,6 @@
 package controller;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -14,20 +10,22 @@ import javax.servlet.http.HttpSession;
 import model.User;
 import utils.DataAccessObject;
 
-@WebServlet(name = "ManageBank", urlPatterns = {"/manageBank"})
-public class ManageBankController extends HttpServlet {
+@WebServlet(name = "ViewExam", urlPatterns = {"/viewExam"})
+public class ViewExamController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setAttribute("banks", DataAccessObject.getBank(-1));
-        request.getRequestDispatcher("manageBank.jsp").forward(request, response);
+        String examCode = request.getParameter("examCode");
+        request.setAttribute("records", DataAccessObject.getRecordsOfAExam(examCode));
+        request.getRequestDispatcher("viewExam.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
+        String examCode = request.getParameter("examCode");
         User user = (User) session.getAttribute("user");
         String action = request.getParameter("action");
         if (action == null) {
@@ -35,13 +33,13 @@ public class ManageBankController extends HttpServlet {
         }
         switch (action) {
             case "remove":
-                String bankIDTxt = request.getParameter("bankID");
-                int bankID = Integer.parseInt(bankIDTxt);
-                if (!DataAccessObject.removeBank(bankID, user.getUserID())) {
-
+                String recordIDTxt = request.getParameter("recordID");
+                int recordID = Integer.parseInt(recordIDTxt);
+                if (!DataAccessObject.removeRecord(recordID, user.getUserID())) {
+                    
                 }
                 break;
         }
-        response.sendRedirect("manageBank");
+        response.sendRedirect("viewExam?examCode=" + examCode);
     }
 }

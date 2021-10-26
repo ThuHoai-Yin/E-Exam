@@ -45,7 +45,7 @@ public class TakeExamController extends HttpServlet {
         User user = (User) session.getAttribute("user");
         if (exam == null) {
             request.setAttribute("msg", "Your exam is overdue or has already been submitted");
-            request.setAttribute("metail", "Please contact your teacher for more information");
+            request.setAttribute("detail", "Please contact your teacher for more information");
             request.setAttribute("backURL", "home");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
@@ -66,12 +66,12 @@ public class TakeExamController extends HttpServlet {
 
         int count = 0;
         for (Question q : exam.getQuestions()) {
-            int count1 = 0;
+            int selected = 0;
             for (Answer a : q.getAnswers()) {
-                a.setSelected(Objects.deepEquals(request.getParameter("answerID-" + a.getAnswerID()), "on"));
-                count1 += (a.isSelected() ? 1 : 0);
+                a.setSelected(Objects.deepEquals(request.getParameter("answer." + a.getAnswerID()), "on"));
+                selected += (a.isSelected() ? 1 : 0);
             }
-            if (count1 > q.getMaxChoose()) {
+            if (selected > q.getMaxChoose()) {
                 request.setAttribute("msg", "Your exam was submitted is invalid!");
                 request.setAttribute("detail", "Please retake another exam");
                 request.setAttribute("backURL", "home");
@@ -79,7 +79,7 @@ public class TakeExamController extends HttpServlet {
                 session.setAttribute("exam", null);
                 return;
             }
-            count += count1;
+            count += selected;
         }
         if (DataAccessObject.saveRecord(exam.getExamCode(), user.getUserID(), exam, count)) {
             request.setAttribute("msg", "Your exam has been recorded");

@@ -1,3 +1,5 @@
+<%@page import="java.sql.Timestamp"%>
+<%@page import="java.text.SimpleDateFormat"%>
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -20,43 +22,58 @@
             <div class="mt-10 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                     <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <table class="table-fixed divide-y divide-gray-200" style="width: 90rem">
+                        <table class="table-auto divide-y divide-gray-200" style="min-width: 70rem;">
                             <thead class="bg-gray-50">
                             <th scope="col"
-                                class="w-1/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Exam Code</th>
                             <th scope="col"
-                                class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Open Date</th>
                             <th scope="col"
-                                class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Close Date</th>
                             <th scope="col"
-                                class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Num of Questions</th>
                             <th scope="col"
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Duration (Sec)</th>
-                            <th scope="col" class="w-1/6"></th>
+                            <th scope="col"></th>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <c:if test="${not empty exams}">
                                     <c:forEach var="exam" items="${exams}">
                                         <tr>
+                                            <c:set var="temp" value="${exam.getOpenDate()}"/>                                            
                                             <td class="px-6 py-4 whitespace-nowrap">${exam.getExamCode()}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap">${exam.getOpenDate() == null ?
-                                                                                      '-' : exam.getOpenDate()}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap">${exam.getCloseDate() == null ?
-                                                                                      '-' : exam.getCloseDate()}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap"><%
+                                                    Object time = pageContext.getAttribute("temp");
+                                                    if (time == null) out.println("-");
+                                                    else out.println(new SimpleDateFormat("hh:mm dd/MM/yyyy").format((Timestamp)time));
+                                                %></td>
+                                            <c:set var="temp" value="${exam.getCloseDate()}"/>   
+                                            <td class="px-6 py-4 whitespace-nowrap"><%
+                                                    time = pageContext.getAttribute("temp");
+                                                    if (time == null) out.println("-");
+                                                    else out.println(new SimpleDateFormat("hh:mm dd/MM/yyyy").format((Timestamp)time));
+                                                %></td>
+                                            <c:remove var="temp" scope="page"/>
                                             <td class="px-6 py-4 whitespace-nowrap">${exam.getQuestions().size()}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">${exam.getDuration()}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap flex justify-end gap-x-5">
-                                                <a class="cursor-pointer text-lg text-green-500 hover:text-green-700"
-                                                   onclick="navigator.clipboard.writeText(<c:out value="'${exam.getExamCode()}'" />)">Copy</a>
-                                                <a class="cursor-pointer text-lg text-blue-500 hover:text-blue-700"
-                                                   onclick="">Edit</a>
+                                            <td class="px-6 py-4 whitespace-nowrap flex justify-end gap-x-3">
+                                                <a class="w-16 text-right cursor-pointer text-lg text-green-500 hover:text-green-700"
+                                                   onclick="{
+                                                               navigator.clipboard.writeText(<c:out value="'${exam.getExamCode()}'" />);
+                                                               this.innerHTML = 'Copied';
+                                                               setTimeout(function (el) {
+                                                                   el.innerHTML = 'Copy';
+                                                               }, 5000, this);
+                                                           }">Copy</a>
+                                                <a class="cursor-pointer text-lg text-yellow-500 hover:text-yellow-700"
+                                                   href="viewExam?examCode=<c:out value="${exam.getExamCode()}" />">View</a>
                                                 <a class="cursor-pointer text-lg text-red-500 hover:text-red-700"
                                                    onclick="removeExam(<c:out value="'${exam.getExamCode()}'"/>)">Remove</a>
                                             </td>
@@ -95,9 +112,7 @@
                         </div>
                         <h3 class="text-lg leading-6 font-medium text-gray-900">Warning!</h3>
                         <div class="mt-2 px-7 py-3">
-                            <p class="text-sm text-gray-500" id="remove-msg">Do you want to remove ""?<br />
-                                This action also removes all related records
-                            </p>
+                            <p class="text-sm text-gray-500" id="remove-msg"></p>
                         </div>
                         <form action="manageExam" method="post"
                               class="items-center px-4 py-3 flex flex-1 gap-5 justify-center">
@@ -139,7 +154,7 @@
                         <label class="block w-full" for="examNameIn">
                             <span class="text-gray-700">Exam Name</span>
                             <input class="form-input mt-1 block w-full" type="text" name="examName"
-                                   placeholder="JP113 Progress Test 1" id="examNameIn" />
+                                   placeholder="JP113 Progress Test 1" id="examNameIn" required/>
                         </label>
 
 
@@ -158,13 +173,13 @@
                         <label class="block w-full" for="numOfQuestionsIn">
                             <span class="text-gray-700">Number Of Questions</span>
                             <input class="form-input mt-1 block w-full" type="number" name="numOfQuestions" min="1"
-                                   placeholder="10" id="numOfQuestionsIn" />
+                                   placeholder="10" id="numOfQuestionsIn" required/>
                         </label>
 
                         <label class="block w-full" for="durationIn">
                             <span class="text-gray-700">Duration (sec)</span>
                             <input class="form-input mt-1 block w-full" type="number" name="duration" min="30"
-                                   max="10800" placeholder="600" id="durationIn" />
+                                   max="10800" placeholder="600" id="durationIn" required/>
                         </label>
 
                         <div class="items-center px-4 py-3 flex flex-1 gap-5 justify-center">

@@ -22,11 +22,11 @@
                                <c:if test="${path == '/home.jsp'}">font-semibold border-purple-600</c:if>">Home</a>
                             <c:if test="${user.getRole().canManageBank()}">
                                 <a href="manageBank" class="w-32 text-center py-2 text-base font-medium border-b-2 
-                                   <c:if test="${path == '/manageBank.jsp'}">font-semibold border-purple-600</c:if>">Bank</a>
+                                   <c:if test="${path == '/manageBank.jsp' || path == '/createBank.jsp'}">font-semibold border-purple-600</c:if>">Bank</a>
                             </c:if>
                             <c:if test="${user.getRole().canManageExam()}">
                                 <a href="manageExam" class="w-32 text-center py-2 text-base font-medium border-b-2 
-                                   <c:if test="${path == '/manageExam.jsp'}">font-semibold border-purple-600</c:if>">Exam</a>
+                                   <c:if test="${path == '/manageExam.jsp' || path == '/viewExam.jsp' || path == '/viewRecord.jsp'}">font-semibold border-purple-600</c:if>">Exam</a>
                             </c:if>    
                             <c:if test="${user.getRole().canManageAccount()}">
                                 <a href="manageAccount" class="w-32 text-center py-2 text-base font-medium border-b-2 
