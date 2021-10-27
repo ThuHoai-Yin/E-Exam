@@ -19,14 +19,15 @@ public class Crypto {
         } catch (NoSuchAlgorithmException ex) {
         }
     }
-    
+
     public static String getRandomString(int length) {
         String result = "";
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < length; i++) {
             result += charPool.charAt(random.nextInt(charPool.length()));
+        }
         return result;
     }
-    
+
     public static byte[] getSalt() {
         byte[] salt = new byte[16];
         random.nextBytes(salt);

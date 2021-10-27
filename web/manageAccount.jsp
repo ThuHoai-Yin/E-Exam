@@ -99,14 +99,14 @@
                             <input type="hidden" name="action" value="remove" />
                             <input type="hidden" id="remove-userID" name="userID" />
                             <button type="submit" onclick="{
-                                                                            document.getElementById('remove-modal').style.display = 'none'
-                                                                        }"
+                                        document.getElementById('remove-modal').style.display = 'none';
+                                    }"
                                     class="w-28 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-red-600 bg-red-50 border-red-200 hover:bg-red-100 active:bg-red-200 focus:ring-red-300">
                                 OK
                             </button>
                             <button form="" onclick="{
-                                                                            document.getElementById('remove-modal').style.display = 'none'
-                                                                        }"
+                                        document.getElementById('remove-modal').style.display = 'none';
+                                    }"
                                     class="w-28 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-gray-600 bg-gray-50 border-gray-200 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-300">
                                 Close
                             </button>
@@ -156,8 +156,8 @@
                                 class="w-28 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-green-600 bg-green-50 border-green-200 hover:bg-green-100 active:bg-green-200 focus:ring-green-300"
                                 type="submit">Add</button>
                             <button form="" onclick="{
-                                                                            document.getElementById('addoredit-modal').style.display = 'none'
-                                                                        }"
+                                        document.getElementById('addoredit-modal').style.display = 'none';
+                                    }"
                                     class="w-28 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-gray-600 bg-gray-50 border-gray-200 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-300">Close</button>
                         </div>
                     </form>
@@ -178,8 +178,8 @@
                 document.getElementById('emailIn').value = '';
 
                 var btn = document.querySelector('#addoredit-modal button[type=submit]');
-                btn.innerHTML = 'Add'
-                btn.className = 'w-28 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-green-600 bg-green-50 border-green-200 hover:bg-green-100 active:bg-green-200 focus:ring-green-300'
+                btn.innerHTML = 'Add';
+                btn.className = 'w-28 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-green-600 bg-green-50 border-green-200 hover:bg-green-100 active:bg-green-200 focus:ring-green-300';
                 document.getElementById('addoredit-modal').style.display = 'flex';
             }
             function editAccount(id, username, fullName, email, selectedRole) {
@@ -201,12 +201,12 @@
                 }
 
                 var btn = document.querySelector('#addoredit-modal button[type=submit]');
-                btn.innerHTML = 'Edit'
-                btn.className = 'w-28 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-blue-600 bg-blue-50 border-blue-200 hover:bg-blue-100 active:bg-blue-200 focus:ring-blue-300'
+                btn.innerHTML = 'Edit';
+                btn.className = 'w-28 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-blue-600 bg-blue-50 border-blue-200 hover:bg-blue-100 active:bg-blue-200 focus:ring-blue-300';
                 document.getElementById('addoredit-modal').style.display = 'flex';
             }
             function removeAccount(id, username) {
-                document.getElementById('remove-msg').innerHTML = 'Do you want to remove "' + username + '"?<br/>This action also removes all related information'
+                document.getElementById('remove-msg').innerHTML = 'Do you want to remove "' + username + '"?<br/>This action also removes all related information';
                 document.getElementById('remove-modal').style.display = 'flex';
                 document.getElementById('remove-userID').value = id;
             }

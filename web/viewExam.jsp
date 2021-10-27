@@ -54,9 +54,9 @@
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getRecordID()}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getStudentID()}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getStudentFullname()}</td>
-                                                <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("dd-mm-yyyy hh:mm:ss").format(pageContext.getAttribute("temp"))%></td>                                                
+                                                <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(pageContext.getAttribute("temp"))%></td>                                                
                                                 <c:set var="temp" value="${record.getDateSubmitted()}"/>
-                                                <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("dd-mm-yyyy hh:mm:ss").format(pageContext.getAttribute("temp"))%></td>
+                                                <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(pageContext.getAttribute("temp"))%></td>
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getNumOfCorrectAnswers()}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getNumOfAnswers()}</td>
                                                 <c:remove var="temp" scope="page"/>
@@ -107,13 +107,13 @@
                             <input type="hidden" id="remove-recordID" name="recordID" />
                             <input type="hidden" name="examCode" value="${param.examCode}" />
                             <button type="submit" onclick="{
-                                        document.getElementById('remove-modal').style.display = 'none'
+                                        document.getElementById('remove-modal').style.display = 'none';
                                     }"
                                     class="w-28 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-red-600 bg-red-50 border-red-200 hover:bg-red-100 active:bg-red-200 focus:ring-red-300">
                                 OK
                             </button>
                             <button form="" onclick="{
-                                        document.getElementById('remove-modal').style.display = 'none'
+                                        document.getElementById('remove-modal').style.display = 'none';
                                     }"
                                     class="w-28 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-gray-600 bg-gray-50 border-gray-200 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-300">
                                 Close
@@ -125,7 +125,7 @@
         </main>
         <script>
             function removeRecord(id, studentFullname) {
-                document.getElementById('remove-msg').innerHTML = 'Do you want to remove the record of <br/>"' + studentFullname + '"?'
+                document.getElementById('remove-msg').innerHTML = 'Do you want to remove the record of <br/>"' + studentFullname + '"?';
                 document.getElementById('remove-modal').style.display = 'flex';
                 document.getElementById('remove-recordID').value = id;
             }

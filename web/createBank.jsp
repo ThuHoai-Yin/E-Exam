@@ -27,7 +27,7 @@
                                 class="w-28 p-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-red-600 bg-red-50 border-red-200 hover:bg-red-100 active:bg-red-200 focus:ring-red-300">Back</button>
                     </a>   
                     <button onclick="addQuestion(this)" type="button"
-                                   class="p-2 rounded-full bg-white hover:opacity-80">
+                            class="p-2 rounded-full bg-white hover:opacity-80">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
@@ -88,12 +88,12 @@
             function addAnswer(btn) {
                 let parentId = btn.parentElement.getElementsByTagName('textarea')[0].getAttribute('name').split('.')[1];
                 let target = btn.parentElement.getElementsByClassName('answer-container')[0];
-                let childId = makeid(4)
+                let childId = makeid(4);
                 let el = document.getElementById('answer-template').cloneNode(true);
                 el.id = '';
                 el.style.display = 'flex';
-                el.querySelector('input[type=txt]').setAttribute('name', 'answer.' + parentId + '.' + childId)
-                el.querySelector('input[type=checkbox]').setAttribute('name', 'correct.' + parentId + '.' + childId)
+                el.querySelector('input[type=txt]').setAttribute('name', 'answer.' + parentId + '.' + childId);
+                el.querySelector('input[type=checkbox]').setAttribute('name', 'correct.' + parentId + '.' + childId);
                 target.appendChild(el);
             }
             function addQuestion() {
@@ -101,7 +101,7 @@
                 let el = document.getElementById('question-template').cloneNode(true);
                 el.id = '';
                 el.style.display = 'flex';
-                el.getElementsByTagName('textarea')[0].setAttribute('name', 'question.' + makeid(4))
+                el.getElementsByTagName('textarea')[0].setAttribute('name', 'question.' + makeid(4));
                 el.getElementsByClassName('num')[0].innerHTML = counter;
                 document.getElementById('question-container').appendChild(el);
             }

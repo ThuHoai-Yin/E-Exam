@@ -3,10 +3,7 @@ package controller;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -35,26 +32,30 @@ public class ManageExamController extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         String action = request.getParameter("action");
-        if (action == null) {
-            return;
-        }
-        switch (action) {
-            case "add":
-                String bankIDTxt = request.getParameter("bankID");
-                String examName = request.getParameter("examName");
-                String openDateTxt = request.getParameter("openDate");
-                String closeDateTxt = request.getParameter("closeDate");
-                String numOfQuestionsTxt = request.getParameter("numOfQuestions");
-                String durationTxt = request.getParameter("duration");
 
-                DateFormat formatter = new SimpleDateFormat("hh:mm dd/MM/yyyy");
-                Timestamp openDate = null,
-                 closeDate = null;
-                int bankID,
-                 numOfQuestions,
-                 duration;
+        try {
+            if (action == null) {
+                throw new Exception("Null");
+            }
+            switch (action) {
+                case "add":
+                    String bankIDTxt = request.getParameter("bankID");
+                    String examName = request.getParameter("examName");
+                    String openDateTxt = request.getParameter("openDate");
+                    String closeDateTxt = request.getParameter("closeDate");
+                    String numOfQuestionsTxt = request.getParameter("numOfQuestions");
+                    String durationTxt = request.getParameter("duration");
 
-                try {
+                    if (bankIDTxt == null || examName == null || numOfQuestionsTxt == null || durationTxt == null) {
+                        throw new Exception("Null");
+                    }
+
+                    DateFormat formatter = new SimpleDateFormat("hh:mm dd/MM/yyyy");
+                    Timestamp openDate = null,
+                     closeDate = null;
+                    int bankID,
+                     numOfQuestions,
+                     duration;
                     bankID = Integer.parseInt(bankIDTxt);
                     if (!openDateTxt.isEmpty()) {
                         openDate = new Timestamp(formatter.parse(openDateTxt).getTime());
@@ -64,20 +65,27 @@ public class ManageExamController extends HttpServlet {
                     }
                     numOfQuestions = Integer.parseInt(numOfQuestionsTxt);
                     duration = Integer.parseInt(durationTxt);
-                } catch (ParseException ex) {
-                    System.out.println(ex.getMessage());
-                    return;
-                }
-                if (!DataAccessObject.createExam(bankID, user.getUserID(), examName, openDate, closeDate, numOfQuestions, duration)) {
-                    break;
-                }
-            case "remove":
-                String examCode = request.getParameter("examCode");
-                if (!DataAccessObject.removeExam(examCode, user.getUserID())) {
 
-                }
-                break;
+                    if (!DataAccessObject.createExam(bankID, user.getUserID(), examName, openDate, closeDate, numOfQuestions, duration)) {
+                        throw new Exception("Failed");
+                    }
+                    break;
+                case "remove":
+                    String examCode = request.getParameter("examCode");
+                    if (examCode == null) {
+                        throw new Exception("Null");
+                    }
+                    if (!DataAccessObject.removeExam(examCode, user.getUserID())) {
+                        throw new Exception("Failed");
+                    }
+                    break;
+            }
+            response.sendRedirect("manageExam");
+        } catch (Exception ex) {
+            request.setAttribute("msg", "Invalid request!");
+            request.setAttribute("backURL", "manageExam");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            System.out.println(ex.getMessage());
         }
-        response.sendRedirect("manageExam");
     }
 }

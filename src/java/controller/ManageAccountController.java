@@ -1,7 +1,6 @@
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,56 +23,67 @@ public class ManageAccountController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
-        if (action == null) {
-            return;
-        }
-        switch (action) {
-            case "add":
-                String username = request.getParameter("username");
-                String password = request.getParameter("password");
-                String fullName = request.getParameter("fullName");
-                String email = request.getParameter("email");
-                String roleName = request.getParameter("roleName");
-                
-                // Validation
-                                
-                if (!DataAccessObject.register(username, password, fullName, email, roleName)) {
-                    request.setAttribute("msg", "This username is already existed");
-                    request.setAttribute("detail", "Please use another username");
-                    request.setAttribute("backURL", "manageAccount");
-                    request.getRequestDispatcher("error.jsp").forward(request, response);
-                }
-                break;
-            case "edit":  
-                String userIDStr = request.getParameter("userID");
-                password = request.getParameter("password");
-                fullName = request.getParameter("fullName");
-                email = request.getParameter("email");
-                roleName = request.getParameter("roleName");
-                
-                // Validation
-                
-                try {
+
+        try {
+            if (action == null) {
+                throw new Exception("Null");
+            }
+
+            switch (action) {
+                case "add":
+                    String username = request.getParameter("username");
+                    String password = request.getParameter("password");
+                    String fullName = request.getParameter("fullName");
+                    String email = request.getParameter("email");
+                    String roleName = request.getParameter("roleName");
+
+                    // Validation                
+                    if (username == null || password == null || fullName == null || email == null || roleName == null) {
+                        throw new Exception("Null");
+                    }
+
+                    if (!DataAccessObject.register(username, password, fullName, email, roleName)) {
+                        throw new Exception("Failed");
+                    }
+                    break;
+                case "edit":
+                    String userIDStr = request.getParameter("userID");
+                    password = request.getParameter("password");
+                    fullName = request.getParameter("fullName");
+                    email = request.getParameter("email");
+                    roleName = request.getParameter("roleName");
+
+                    // Validation
+                    if (userIDStr == null || password == null || fullName == null || email == null || roleName == null) {
+                        throw new Exception("Null");
+                    }
+
                     int userID = Integer.parseInt(userIDStr);
                     if (!DataAccessObject.updateAccount(userID, password, fullName, email, roleName)) {
-
+                        throw new Exception("Failed");
                     }
-                } catch (NumberFormatException ex) {
+                    break;
 
-                }                
-                break;
-            case "remove":
-                userIDStr = request.getParameter("userID");
-                try {
-                    int userID = Integer.parseInt(userIDStr);
+                case "remove":
+                    userIDStr = request.getParameter("userID");
+
+                    // Validation
+                    if (userIDStr == null) {
+                        throw new Exception("Null");
+                    }
+
+                    userID = Integer.parseInt(userIDStr);
                     if (!DataAccessObject.removeAccount(userID)) {
-
+                        throw new Exception("Failed");
                     }
-                } catch (NumberFormatException ex) {
-
-                }
-                break;
+                    break;
+            }
+            response.sendRedirect("manageAccount");
+        } catch (Exception ex) {
+            request.setAttribute("msg", "Invalid request!");
+            request.setAttribute("backURL", "manageAccount");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            System.out.println(ex.getMessage());
         }
-        response.sendRedirect("manageAccount");
     }
 }

@@ -1,10 +1,6 @@
 package controller;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -31,14 +27,38 @@ public class ManageBankController extends HttpServlet {
         User user = (User) session.getAttribute("user");
         String action = request.getParameter("action");
         if (action == null) {
+            request.setAttribute("msg", "Invalid request!");
+            request.setAttribute("detail", "");
+            request.setAttribute("backURL", "manageBank");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
+
         switch (action) {
             case "remove":
                 String bankIDTxt = request.getParameter("bankID");
-                int bankID = Integer.parseInt(bankIDTxt);
-                if (!DataAccessObject.removeBank(bankID, user.getUserID())) {
-
+                if (bankIDTxt == null) {
+                    request.setAttribute("msg", "Invalid request!");
+                    request.setAttribute("detail", "");
+                    request.setAttribute("backURL", "manageBank");
+                    request.getRequestDispatcher("error.jsp").forward(request, response);
+                    return;
+                }
+                try {
+                    int bankID = Integer.parseInt(bankIDTxt);
+                    if (!DataAccessObject.removeBank(bankID, user.getUserID())) {
+                        request.setAttribute("msg", "Invalid request!");
+                        request.setAttribute("detail", "");
+                        request.setAttribute("backURL", "manageBank");
+                        request.getRequestDispatcher("error.jsp").forward(request, response);
+                        return;
+                    }
+                } catch (NumberFormatException ex) {
+                    request.setAttribute("msg", "Invalid request!");
+                    request.setAttribute("detail", "");
+                    request.setAttribute("backURL", "manageBank");
+                    request.getRequestDispatcher("error.jsp").forward(request, response);
+                    return;
                 }
                 break;
         }

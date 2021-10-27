@@ -29,6 +29,14 @@ public class HomeController extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         String examCode = request.getParameter("examCode");
+
+        if (examCode == null) {
+            request.setAttribute("msg", "Invalid request!");
+            request.setAttribute("backURL", "home");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+
         List<Exam> result = DataAccessObject.getExam(examCode, -1);
         if (!result.isEmpty()) {
             Exam exam = result.get(0);
@@ -55,9 +63,9 @@ public class HomeController extends HttpServlet {
                 Timestamp later = new Timestamp(cal.getTime().getTime());
                 exam.setExamEndTime(later);
                 exam.shuffle();
-                for (Question q : exam.getQuestions()) {
+                exam.getQuestions().forEach((q) -> {
                     q.shuffle();
-                }
+                });
                 session.setAttribute("exam", exam);
                 response.sendRedirect("exam");
             } else {

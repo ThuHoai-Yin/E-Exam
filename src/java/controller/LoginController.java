@@ -16,7 +16,7 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+        request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 
     @Override
@@ -26,16 +26,27 @@ public class LoginController extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String roleName = request.getParameter("roleName");
-        User user = DataAccessObject.login(username, password, roleName);
-        if (user == null) {
-            request.setAttribute("errMsg", " - Username or Password is invalid.");
-            request.setAttribute("lastUser", username);
-            request.setAttribute("userRole", roleName);
-            request.getRequestDispatcher("login.jsp").forward(request, response);
-        } else {
-            session.setAttribute("user", user);
-            response.sendRedirect("home");
-        }
 
+        try {
+            if (username == null || password == null || roleName == null) {
+                throw new Exception("Null");
+            }
+
+            User user = DataAccessObject.login(username, password, roleName);
+            if (user == null) {
+                request.setAttribute("errMsg", " - Username or Password is invalid.");
+                request.setAttribute("lastUser", username);
+                request.setAttribute("userRole", roleName);
+                request.getRequestDispatcher("login.jsp").forward(request, response);
+            } else {
+                session.setAttribute("user", user);
+                response.sendRedirect("home");
+            }
+        } catch (Exception ex) {
+            request.setAttribute("msg", "Invalid request!");
+            request.setAttribute("backURL", "login");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            System.out.println(ex.getMessage());
+        }
     }
 }

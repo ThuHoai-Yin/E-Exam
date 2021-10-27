@@ -63,7 +63,7 @@ public class Exam {
     public void setCreatorFullName(String creatorFullName) {
         this.creatorFullName = creatorFullName;
     }
-    
+
     public Timestamp getExamEndTime() {
         return examEndTime;
     }
@@ -79,7 +79,7 @@ public class Exam {
     public void setDuration(int duration) {
         this.duration = duration;
     }
-    
+
     public void shuffle() {
         Collections.shuffle(this.questions);
     }

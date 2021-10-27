@@ -55,7 +55,7 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">${bank.getQuestions().size()}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("hh:mm dd/MM/yyyy").format(pageContext.getAttribute("temp"))%></td>
+                                            <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("dd-MM-yyyy hh:mm").format(pageContext.getAttribute("temp"))%></td>
                                             <c:remove var="temp" scope="page"/>
                                             <td class="px-6 py-4 whitespace-nowrap flex justify-end gap-x-3">
                                                 <a <c:if test="${bank.getCreatorID() == user.getUserID()}">
@@ -125,7 +125,7 @@
             </div> 
             <script>
                 function removeBank(id, name) {
-                    document.getElementById('remove-msg').innerHTML = 'Do you want to remove "' + name + '"?<br/>This action may removes some related questions'
+                    document.getElementById('remove-msg').innerHTML = 'Do you want to remove "' + name + '"?<br/>This action may removes some related questions';
                     document.getElementById('remove-modal').style.display = 'flex';
                     document.getElementById('remove-bankID').value = id;
                 }

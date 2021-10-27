@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public class Bank {
+
     private int bankID;
     private String bankName;
     private String courseName;

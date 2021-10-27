@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Question {
+
     private int questionID;
     private String content;
     private int maxChoose;
@@ -15,7 +16,7 @@ public class Question {
         this.maxChoose = maxChoose;
         this.answers = answers;
     }
-    
+
     public int getQuestionID() {
         return questionID;
     }
@@ -46,8 +47,8 @@ public class Question {
 
     public void setAnswers(List<Answer> answers) {
         this.answers = answers;
-    } 
-    
+    }
+
     public void shuffle() {
         Collections.shuffle(this.answers);
     }

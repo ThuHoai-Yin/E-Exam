@@ -352,7 +352,7 @@ public class DataAccessObject {
                         + "inner join recordDetailTbl rdt on rt.recordID = rdt.recordID\n"
                         + "inner join examTbl et on rt.examCode = et.examCode \n"
                         + "where rt.recordID = ? and et.creatorID = ?";
-                
+
                 try (PreparedStatement stm = conn.prepareStatement(query)) {
                     stm.setInt(1, recordID);
                     stm.setInt(2, creatorID);

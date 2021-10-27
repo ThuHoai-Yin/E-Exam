@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import model.Answer;
 import model.User;
 import model.Question;
 import model.Exam;
@@ -67,10 +66,11 @@ public class TakeExamController extends HttpServlet {
         int count = 0;
         for (Question q : exam.getQuestions()) {
             int selected = 0;
-            for (Answer a : q.getAnswers()) {
+            selected = q.getAnswers().stream().map((a) -> {
                 a.setSelected(Objects.deepEquals(request.getParameter("answer." + a.getAnswerID()), "on"));
-                selected += (a.isSelected() ? 1 : 0);
-            }
+                return a;
+            }).map((a) -> (a.isSelected() ? 1 : 0)).reduce(selected, Integer::sum);
+
             if (selected > q.getMaxChoose()) {
                 request.setAttribute("msg", "Your exam was submitted is invalid!");
                 request.setAttribute("detail", "Please retake another exam");

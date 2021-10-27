@@ -1,11 +1,12 @@
 package model;
 
 public class User {
+
     private int userID;
     private String username;
     private String fullname;
     private String email;
-    private Role role; 
+    private Role role;
 
     public User(int userID, String username, String fullname, String email, Role role) {
         this.userID = userID;

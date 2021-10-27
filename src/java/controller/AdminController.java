@@ -26,14 +26,21 @@ public class AdminController extends HttpServlet {
         HttpSession session = request.getSession();
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        
+
         //Validation
-        
+        if (username == null || password == null) {
+            request.setAttribute("msg", "Invalid request!");
+            request.setAttribute("detail", "");
+            request.setAttribute("backURL", "admin");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+
         User user = DataAccessObject.login(username, password, "admin");
         if (user == null) {
             request.setAttribute("errMsg", " - Username or Password is invalid.");
             request.setAttribute("lastUser", username);
-            Object obj = request.getServletContext().getAttribute("loginFailureTimes");         
+            Object obj = request.getServletContext().getAttribute("loginFailureTimes");
             int loginFailureTimes = obj != null ? (Integer) obj : 0;
             request.getServletContext().setAttribute("loginFailureTimes", loginFailureTimes + 1);
             request.getRequestDispatcher("admin.jsp").forward(request, response);

@@ -15,7 +15,7 @@ public class ErrorController extends HttpServlet {
             throws ServletException, IOException {
         int statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
         switch (statusCode) {
-            case 403:                
+            case 403:
                 request.setAttribute("code", "403");
                 request.setAttribute("msg", "Forbidden");
                 request.setAttribute("detail", "Your role cannot access this content");

@@ -15,17 +15,26 @@ public class ViewRecordController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {     
-        HttpSession session = request.getSession();   
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+
         String examCode = request.getParameter("examCode");
         String recordIDTxt = request.getParameter("recordID");
-        User user = (User) session.getAttribute("user");
-        int recordID = Integer.parseInt(recordIDTxt); 
-        System.out.println(user.getUserID());
-        System.out.println(DataAccessObject.getQuestionsAndCorrectAnswer(examCode, user.getUserID()));
-        System.out.println(DataAccessObject.getSelectedAnswers(recordID, user.getUserID()));
-        request.setAttribute("questions", DataAccessObject.getQuestionsAndCorrectAnswer(examCode, user.getUserID()));
-        request.setAttribute("selected", DataAccessObject.getSelectedAnswers(recordID, user.getUserID()));
-        request.getRequestDispatcher("viewRecord.jsp").forward(request, response);
+        try {
+            if (examCode == null || recordIDTxt == null) {
+                throw new Exception("Null");
+            }
+
+            int recordID = Integer.parseInt(recordIDTxt);
+            request.setAttribute("questions", DataAccessObject.getQuestionsAndCorrectAnswer(examCode, user.getUserID()));
+            request.setAttribute("selected", DataAccessObject.getSelectedAnswers(recordID, user.getUserID()));
+            request.getRequestDispatcher("viewRecord.jsp").forward(request, response);
+        } catch (Exception ex) {
+            request.setAttribute("msg", "Invalid request!");
+            request.setAttribute("backURL", examCode != null ? "viewExam?examCode=" + examCode : "home");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            System.out.println(ex.getMessage());
+        }
     }
 }

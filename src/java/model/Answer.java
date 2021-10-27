@@ -1,6 +1,7 @@
 package model;
 
 public class Answer {
+
     private int answerID;
     private String content;
     private boolean selected = false;
@@ -17,7 +18,7 @@ public class Answer {
     public void setAnswerID(int answerID) {
         this.answerID = answerID;
     }
- 
+
     public String getContent() {
         return content;
     }
@@ -25,17 +26,17 @@ public class Answer {
     public void setContent(String content) {
         this.content = content;
     }
-    
+
     public boolean isSelected() {
         return selected;
     }
 
     public void setSelected(boolean selected) {
         this.selected = selected;
-    }    
+    }
 
     @Override
     public String toString() {
         return "Answer{" + "content=" + content + ", selected=" + selected + '}';
-    }  
+    }
 }

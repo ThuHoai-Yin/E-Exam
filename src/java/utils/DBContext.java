@@ -3,7 +3,6 @@ package utils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBContext {
@@ -17,18 +16,17 @@ public class DBContext {
 
     private static final String connectionStr = "jdbc:sqlserver://" + hostname + ":" + serverPort + ";databaseName=" + dbName;
 
-    
     private static HikariConfig config = new HikariConfig();
     private static HikariDataSource ds;
 
-    static {       
+    static {
         config.setJdbcUrl(connectionStr);
         config.setUsername(username);
         config.setPassword(password);
         config.setDriverClassName(driver);
-        config.addDataSourceProperty("cachePrepStmts" , "true");
-        config.addDataSourceProperty("prepStmtCacheSize" , "250");
-        config.addDataSourceProperty("prepStmtCacheSqlLimit" , "2048");
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         ds = new HikariDataSource(config);
     }
 

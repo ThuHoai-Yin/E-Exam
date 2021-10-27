@@ -48,17 +48,23 @@
                                             <c:set var="temp" value="${exam.getOpenDate()}"/>                                            
                                             <td class="px-6 py-4 whitespace-nowrap">${exam.getExamCode()}</td>
                                             <td class="px-6 py-4 whitespace-nowrap"><%
-                                                    Object time = pageContext.getAttribute("temp");
-                                                    if (time == null) out.println("-");
-                                                    else out.println(new SimpleDateFormat("hh:mm dd/MM/yyyy").format((Timestamp)time));
+                                                Object time = pageContext.getAttribute("temp");
+                                                if (time == null) {
+                                                    out.println("-");
+                                                } else {
+                                                    out.println(new SimpleDateFormat("dd-MM-yyyy hh:mm").format((Timestamp) time));
+                                                }
                                                 %></td>
-                                            <c:set var="temp" value="${exam.getCloseDate()}"/>   
+                                                <c:set var="temp" value="${exam.getCloseDate()}"/>   
                                             <td class="px-6 py-4 whitespace-nowrap"><%
-                                                    time = pageContext.getAttribute("temp");
-                                                    if (time == null) out.println("-");
-                                                    else out.println(new SimpleDateFormat("hh:mm dd/MM/yyyy").format((Timestamp)time));
+                                                time = pageContext.getAttribute("temp");
+                                                if (time == null) {
+                                                    out.println("-");
+                                                } else {
+                                                    out.println(new SimpleDateFormat("dd-MM-yyyy hh:mm").format((Timestamp) time));
+                                                }
                                                 %></td>
-                                            <c:remove var="temp" scope="page"/>
+                                                <c:remove var="temp" scope="page"/>
                                             <td class="px-6 py-4 whitespace-nowrap">${exam.getQuestions().size()}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">${exam.getDuration()}
@@ -187,7 +193,7 @@
                                 class="w-28 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-green-600 bg-green-50 border-green-200 hover:bg-green-100 active:bg-green-200 focus:ring-green-300"
                                 type="submit">Add</button>
                             <button form="" onclick="{
-                                        document.getElementById('add-modal').style.display = 'none'
+                                        document.getElementById('add-modal').style.display = 'none';
                                     }"
                                     class="w-28 py-2 rounded-md text-sm font-medium border shadow focus:outline-none focus:ring transition text-gray-600 bg-gray-50 border-gray-200 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-300">Close</button>
                         </div>
@@ -204,13 +210,13 @@
             function selectBank(el) {
                 document.getElementById('numOfQuestionsIn').max = dict[el.options[el.selectedIndex].value];
                 for (let bank of b)
-                    if (bank.bankID == value) {
+                    if (bank.bankID === value) {
                         document.getElementById('numOfQuestionsIn').max = bank.questions.length;
                         return;
                     }
             }
             function removeExam(examCode) {
-                document.getElementById('remove-msg').innerHTML = 'Do you want to remove "' + examCode + '"?<br/>This action also removes all related records'
+                document.getElementById('remove-msg').innerHTML = 'Do you want to remove "' + examCode + '"?<br/>This action also removes all related records';
                 document.getElementById('remove-modal').style.display = 'flex';
                 document.getElementById('remove-examCode').value = examCode;
             }

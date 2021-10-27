@@ -1,6 +1,7 @@
 package model;
 
 public class Role {
+
     private int roleID;
     private String roleName;
     private boolean canTakeExam;
@@ -64,6 +65,5 @@ public class Role {
     public void setCanManageExam(boolean canManageExam) {
         this.canManageExam = canManageExam;
     }
-    
-    
+
 }

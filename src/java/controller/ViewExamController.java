@@ -25,21 +25,32 @@ public class ViewExamController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        String examCode = request.getParameter("examCode");
         User user = (User) session.getAttribute("user");
+
+        String examCode = request.getParameter("examCode");
         String action = request.getParameter("action");
-        if (action == null) {
-            return;
+
+        try {
+            if (examCode == null || action == null) {
+                throw new Exception("Null");
+            }
+            switch (action) {
+                case "remove":
+                    String recordIDTxt = request.getParameter("recordID");
+                    if (recordIDTxt == null) {
+                        throw new Exception("Null");
+                    }
+                    int recordID = Integer.parseInt(recordIDTxt);
+                    if (!DataAccessObject.removeRecord(recordID, user.getUserID())) {
+                        throw new Exception("Failed");
+                    }
+                    break;
+            }
+            response.sendRedirect("viewExam?examCode=" + examCode);
+        } catch (Exception ex) {
+            request.setAttribute("msg", "Invalid request!");
+            request.setAttribute("backURL", examCode != null ? "viewExam?examCode=" + examCode : "home");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
-        switch (action) {
-            case "remove":
-                String recordIDTxt = request.getParameter("recordID");
-                int recordID = Integer.parseInt(recordIDTxt);
-                if (!DataAccessObject.removeRecord(recordID, user.getUserID())) {
-                    
-                }
-                break;
-        }
-        response.sendRedirect("viewExam?examCode=" + examCode);
     }
 }

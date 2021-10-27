@@ -5,19 +5,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import javafx.util.Pair;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -45,26 +38,24 @@ public class CreateBankController extends HttpServlet {
         String bankName = request.getParameter("bankName");
         String courseName = request.getParameter("courseName");
 
-        Enumeration<String> e = request.getParameterNames();
-        Stream<String> stream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                new Iterator<String>() {
-            public String next() {
-                return e.nextElement();
-            }
+        if (bankName == null || courseName == null) {
+            request.setAttribute("msg", "Invalid request!");
+            request.setAttribute("detail", "");
+            request.setAttribute("backURL", "createBank");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
 
-            public boolean hasNext() {
-                return e.hasMoreElements();
-            }
-        },
-                Spliterator.ORDERED), false);
-        if (!stream.anyMatch(el -> el.startsWith("question")) || !stream.anyMatch(el -> el.startsWith("answer"))) {            
+        List<String> l = Collections.list(request.getParameterNames());
+
+        if (!l.stream().anyMatch(el -> el.startsWith("question")) || !l.stream().anyMatch(el -> el.startsWith("answer"))) {
             request.setAttribute("msg", "Invalid bank format!");
-            request.setAttribute("detail", "Each bank must have questions and each question must have answers");
+            request.setAttribute("detail", "A bank must have at least one question and each question must have at least one answer");
             request.setAttribute("backURL", "manageBank");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
-        
+
         try (Connection conn = DBContext.getConnection()) {
             String query = "insert into bankTbl(bankName, courseName, creatorID, dateCreated)\n"
                     + "output inserted.bankID\n"
@@ -81,12 +72,10 @@ public class CreateBankController extends HttpServlet {
             }
             Map<String, String> questions = new HashMap<>();
 
-            for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-                if (entry.getKey().startsWith("question")) {
-                    String parentId = entry.getKey().substring(9);
-                    questions.put(parentId, entry.getValue()[0]);
-                }
-            }
+            request.getParameterMap().entrySet().stream().filter((entry) -> (entry.getKey().startsWith("question"))).forEachOrdered((entry) -> {
+                String parentId = entry.getKey().substring(9);
+                questions.put(parentId, entry.getValue()[0]);
+            });
 
             if (questions.isEmpty()) {
                 response.sendRedirect("manageBank");
@@ -115,16 +104,14 @@ public class CreateBankController extends HttpServlet {
                 }
             }
 
-            List<Pair<Integer, Pair<String, Boolean>>> answers = new ArrayList<Pair<Integer, Pair<String, Boolean>>>();
+            List<Pair<Integer, Pair<String, Boolean>>> answers = new ArrayList<>();
 
-            for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-                if (entry.getKey().startsWith("answer")) {
-                    String str = entry.getKey().substring(7);
-                    String parentId = str.substring(0, 4);
-                    answers.add(new Pair(questionIds.get(parentId),
-                            new Pair(entry.getValue()[0], Objects.deepEquals(request.getParameter("correct." + str), "on"))));
-                }
-            }
+            request.getParameterMap().entrySet().stream().filter((entry) -> (entry.getKey().startsWith("answer"))).forEachOrdered((entry) -> {
+                String str = entry.getKey().substring(7);
+                String parentId = str.substring(0, 4);
+                answers.add(new Pair(questionIds.get(parentId),
+                        new Pair(entry.getValue()[0], Objects.deepEquals(request.getParameter("correct." + str), "on"))));
+            });
 
             if (answers.isEmpty()) {
                 response.sendRedirect("manageBank");
@@ -150,7 +137,6 @@ public class CreateBankController extends HttpServlet {
 
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            ex.printStackTrace();
         }
         response.sendRedirect("manageBank");
     }
