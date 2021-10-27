@@ -1,11 +1,15 @@
 package utils;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import model.Role;
 
 public class SecurityConfig {
 
-    private static final String[] needAuthPages = new String[]{"/", "/home", "/takeExam", "/manageAccount", "/manageBank", "/manageExam", "/createBank", "/viewExam", "/viewRecord"};
+    private static final Set<String> needAuthPages = new HashSet<String>(
+            Arrays.asList(new String[]{"/", "/home", "/takeExam", "/manageAccount", "/manageBank", "/manageExam", "/createBank", "/viewExam", "/viewRecord"})
+    );
     private static final String[] prohibited = new String[]{"^.*\\.jsp$"};
 
     public static boolean prohibitedPatterns(String servletPath) {
@@ -13,7 +17,7 @@ public class SecurityConfig {
     }
 
     public static boolean needAuthentication(String servletPath) {
-        return Arrays.stream(needAuthPages).anyMatch(el -> el.equals(servletPath));
+        return needAuthPages.contains(servletPath);
     }
 
     public static boolean checkAuthorization(String servletPath, Role role) {
