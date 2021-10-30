@@ -27,6 +27,9 @@
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Exam Code</th>
+                             <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Exam Name</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Open Date</th>
@@ -46,7 +49,8 @@
                                     <c:forEach var="exam" items="${exams}">
                                         <tr>
                                             <c:set var="temp" value="${exam.getOpenDate()}"/>                                            
-                                            <td class="px-6 py-4 whitespace-nowrap">${exam.getExamCode()}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">${exam.getExamCode()}</td>                        
+                                            <td class="px-6 py-4 whitespace-nowrap">${exam.getExamName()}</td>
                                             <td class="px-6 py-4 whitespace-nowrap"><%
                                                 Object time = pageContext.getAttribute("temp");
                                                 if (time == null) {
@@ -166,14 +170,18 @@
 
                         <label class="block w-full" for="openDateIn">
                             <span class="text-gray-700">Open Date</span>
-                            <input class="form-input mt-1 block w-full" type="text" name="openDate"
-                                   placeholder="18:30 25/10/2021" id="openDateIn" />
+                            <input class="form-input mt-1 block w-full" type="text" name="openDate" 
+                                   pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9] ([0][1-9]|[1|2][0-9]|[3][0|1])\/([0][1-9]|[1][0-2])\/[0-9]{4}$"
+                                   title="Ex: 00:00 01/01/2000"
+                                   placeholder="00:00 01/01/2000    " id="openDateIn" />
                         </label>
 
                         <label class="block w-full" for="closeDateIn">
                             <span class="text-gray-700">Close Date</span>
                             <input class="form-input mt-1 block w-full" type="text" name="closeDate"
-                                   placeholder="21:30 25/10/2021" id="closeDateIn" />
+                                   pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9] ([0][1-9]|[1|2][0-9]|[3][0|1])\/([0][1-9]|[1][0-2])\/[0-9]{4}$"
+                                   title="Ex: 00:00 01/01/2000"
+                                   placeholder="00:00 01/01/2000" id="closeDateIn" />
                         </label>
 
                         <label class="block w-full" for="numOfQuestionsIn">

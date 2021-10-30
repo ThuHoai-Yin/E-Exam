@@ -8,13 +8,13 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import model.Answer;
 import model.User;
 import model.Bank;
 import model.Question;
 import model.Exam;
 import model.Record;
+import model.RecordDetail;
 import model.Role;
 import org.apache.catalina.tribes.util.Arrays;
 
@@ -83,6 +83,25 @@ public class DataAccessObject {
                     stm.setString(4, email);
                     stm.setBytes(5, hashed);
                     stm.setBytes(6, salt);
+                    return stm.executeUpdate() > 0;
+                }
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean changePassword(int userID, String password) {
+        try {
+            try (Connection conn = DBContext.getConnection()) {
+                String query = "update userTbl set hashedPassword=?, salt=? where userID=?";
+                try (PreparedStatement stm = conn.prepareStatement(query)) {
+                    byte[] salt = Crypto.getSalt();
+                    byte[] hashed = Crypto.computeHash(password, salt);
+                    stm.setBytes(1, hashed);
+                    stm.setBytes(2, salt);
+                    stm.setInt(3, userID);
                     return stm.executeUpdate() > 0;
                 }
             }
@@ -210,15 +229,21 @@ public class DataAccessObject {
     public static boolean removeExam(String examCode, int creatorID) {
         try {
             try (Connection conn = DBContext.getConnection()) {
-                String query = "delete from examTbl where examCode = ? and creatorID = ?\n"
-                        + "delete from questionTbl\n"
-                        + "where bankID is null and questionID not in \n"
-                        + "(select questionID from examDetailTbl)";
+                String query = "delete from examTbl where examCode = ? and creatorID = ?\n";
                 try (PreparedStatement stm = conn.prepareStatement(query)) {
                     stm.setString(1, examCode);
                     stm.setInt(2, creatorID);
-                    return stm.executeUpdate() > 0;
+                    if (stm.executeUpdate() == 0) {
+                        return false;
+                    }
                 }
+                query = "delete from questionTbl \n"
+                        + "where bankID is null and questionID not in \n"
+                        + "(select questionID from examDetailTbl)";
+                try (PreparedStatement stm = conn.prepareStatement(query)) {
+                    stm.executeUpdate();
+                }
+                return true;
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
@@ -234,7 +259,7 @@ public class DataAccessObject {
                         + "inner join userTbl ut on rt.takerID = ut.userID \n"
                         + "inner join examDetailTbl edt on rt.examCode = edt.examCode \n"
                         + "inner join answerTbl at2 on edt.questionID = at2.questionID \n"
-                        + "left outer join recordDetailTbl rdt on at2.answerID = rdt.answerID\n"
+                        + "left outer join recordDetailTbl rdt on at2.answerID = rdt.answerID and rdt.recordID = rt.recordID \n"
                         + "where at2.isCorrect = 1 and rt.examCode = ?\n"
                         + "group by rt.recordID, rt.takerID, ut.fullname, rt.examDate, rt.dateSubmitted";
 
@@ -249,7 +274,7 @@ public class DataAccessObject {
                 }
             }
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage() + "\n" + ex.getStackTrace());
+            System.out.println(ex.getMessage());
         }
 
         return records;
@@ -310,12 +335,12 @@ public class DataAccessObject {
                         int questionID = resset.getInt("questionID");
                         int answerID = resset.getInt("answerID");
                         if (exam == null || !exam.getExamCode().equals(examCode)) {
-                            if (exam != null) {
+                            if (exam != null && question != null) {
+                                exam.getQuestions().add(question);
                                 exams.add(exam);
                             }
-                            exam = new Exam(examCode, new ArrayList<>(), resset.getTimestamp("openDate"), resset.getTimestamp("closeDate"), resset.getString("fullName"), null, resset.getInt("duration"));
+                            exam = new Exam(examCode, resset.getString("examName"), new ArrayList<>(), resset.getTimestamp("openDate"), resset.getTimestamp("closeDate"), resset.getString("fullName"), null, resset.getInt("duration"));
                             question = new Question(questionID, resset.getString("questionContent"), 0, new ArrayList<>());
-                            answer = new Answer(answerID, resset.getString("answerContent"));
                             maxChoose = 0;
                         }
                         if (question.getQuestionID() != questionID) {
@@ -339,18 +364,19 @@ public class DataAccessObject {
                 }
             }
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage() + "\n" + ex.getStackTrace());
+            System.out.println(ex.getMessage());
         }
         return exams;
     }
 
-    public static Set<Integer> getSelectedAnswers(int recordID, int creatorID) {
-        Set<Integer> selected = new HashSet<>();
+    public static RecordDetail getRecordDetail(int recordID, int creatorID) {
+        RecordDetail result = new RecordDetail("", "", new HashSet<Integer>());
         try {
             try (Connection conn = DBContext.getConnection()) {
                 String query = "select * from recordTbl rt \n"
                         + "inner join recordDetailTbl rdt on rt.recordID = rdt.recordID\n"
                         + "inner join examTbl et on rt.examCode = et.examCode \n"
+                        + "inner join userTbl ut on rt.takerID = ut.userID \n"
                         + "where rt.recordID = ? and et.creatorID = ?";
 
                 try (PreparedStatement stm = conn.prepareStatement(query)) {
@@ -358,15 +384,16 @@ public class DataAccessObject {
                     stm.setInt(2, creatorID);
                     ResultSet resset = stm.executeQuery();
                     while (resset.next()) {
-                        selected.add(resset.getInt("answerID"));
+                        result.setExamName(resset.getString("examName"));
+                        result.setStudentFullName(resset.getString("fullName"));
+                        result.getSelectedAnswers().add(resset.getInt("answerID"));
                     }
                 }
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            ex.printStackTrace();
         }
-        return selected;
+        return result;
     }
 
     public static List<Question> getQuestionsAndCorrectAnswer(String examCode, int creatorID) {
@@ -376,7 +403,7 @@ public class DataAccessObject {
                 String query = "select * from examTbl et \n"
                         + "inner join examDetailTbl edt on et.examCode = edt.examCode \n"
                         + "inner join questionTbl qt on qt.questionID = edt.questionID \n"
-                        + "inner join answerTbl at2 on qt.questionID = at2.questionID\n"
+                        + "inner join answerTbl at2 on qt.questionID = at2.questionID \n"
                         + "inner join userTbl ut on et.creatorID = ut.userID\n"
                         + "where ut.userID = ? and et.examCode = ?\n"
                         + "order by et.examCode, qt.questionID\n";
@@ -412,7 +439,6 @@ public class DataAccessObject {
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            ex.printStackTrace();
         }
         return questions;
     }
@@ -442,11 +468,11 @@ public class DataAccessObject {
                         int answerID = resset.getInt("answerID");
                         if (bank == null || bank.getBankID() != bankID) {
                             if (bank != null) {
+                                bank.getQuestions().add(question);
                                 banks.add(bank);
                             }
                             bank = new Bank(bankID, resset.getString("bankName"), resset.getString("courseName"), resset.getInt("creatorID"), resset.getString("fullName"), new ArrayList<>(), resset.getTimestamp("dateCreated"));
                             question = new Question(questionID, resset.getString("questionContent"), 0, new ArrayList<>());
-                            answer = new Answer(answerID, resset.getString("answerContent"));
                             maxChoose = 0;
                         }
                         if (question.getQuestionID() != questionID) {
@@ -456,8 +482,9 @@ public class DataAccessObject {
                             maxChoose = 0;
                         }
                         answer = new Answer(answerID, resset.getString("answerContent"));
+                        answer.setSelected(resset.getBoolean("isCorrect"));
                         question.getAnswers().add(answer);
-                        if (resset.getBoolean("isCorrect")) {
+                        if (answer.isSelected()) {
                             maxChoose++;
                         }
                     }
@@ -471,7 +498,6 @@ public class DataAccessObject {
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            ex.printStackTrace();
         }
         return banks;
     }
@@ -497,7 +523,6 @@ public class DataAccessObject {
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            ex.printStackTrace();
         }
         return false;
     }
@@ -526,7 +551,6 @@ public class DataAccessObject {
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            ex.printStackTrace();
         }
         return false;
     }
@@ -569,14 +593,13 @@ public class DataAccessObject {
                                 counter += 2;
                             }
                         }
-                    };
+                    }
                     return stm.executeUpdate() > 0;
                 }
 
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            ex.printStackTrace();
         }
         return false;
     }

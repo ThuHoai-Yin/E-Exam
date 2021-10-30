@@ -1028,12 +1028,6 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.slf4j-api-1.7.32.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.slf4j-simple-1.7.32.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.jsoup-1.14.3.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${libs.jstl.classpath}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.HikariCP-4.0.3.jar}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.jsoup-1.14.3.jar}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.mssql-jdbc-9.4.0.jre8.jar}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.slf4j-api-1.7.32.jar}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.slf4j-simple-1.7.32.jar}" todir="${build.web.dir}//"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update"/>
     </target>
@@ -1044,12 +1038,6 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.slf4j-api-1.7.32.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.slf4j-simple-1.7.32.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.jsoup-1.14.3.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${libs.jstl.classpath}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.HikariCP-4.0.3.jar}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.jsoup-1.14.3.jar}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.mssql-jdbc-9.4.0.jre8.jar}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.slf4j-api-1.7.32.jar}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.slf4j-simple-1.7.32.jar}" todir="${build.web.dir}//"/>
     </target>
     <target depends="init" if="dist.ear.dir" name="-clean-webinf-lib">
         <delete dir="${build.web.dir}/WEB-INF/lib"/>
@@ -1460,8 +1448,8 @@ exists or setup the property manually. For example like this:
     <target depends="init,-pre-debug-fix,-do-debug-fix-test" if="netbeans.home" name="debug-fix-test"/>
     <!--
                 
-                CLEANUP SECTION
-            -->
+        CLEANUP SECTION
+    -->
     <target depends="init" name="deps-clean" unless="no.deps"/>
     <target depends="init" name="do-clean">
         <condition property="build.dir.to.clean" value="${build.web.dir}">

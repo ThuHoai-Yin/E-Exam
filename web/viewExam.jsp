@@ -1,3 +1,4 @@
+<%@page import="java.sql.Timestamp"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -16,7 +17,7 @@
     <body>
         <jsp:include page="header.jsp" />
         <c:set var="records" value="${requestScope.records}" />
-        <main class="pt-16 flex flex-col items-center justify-center">
+        <main class="pt-16 flex flex-col items-center justify-center mb-10">
             <div>
                 <div class="mt-10 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8 mb-4">
                     <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -49,20 +50,42 @@
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     <c:if test="${not empty records}">
                                         <c:forEach var="record" items="${records}">
-                                            <tr>
+                                            <tr <c:if test="${record.getDateSubmitted() != null}">
+                                                    class="text-green-600"
+                                                </c:if>
+                                                <c:if test="${record.getDateSubmitted() == null}">
+                                                    class="text-yellow-600"
+                                                </c:if>    
+                                                >
                                                 <c:set var="temp" value="${record.getExamDate()}"/>
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getRecordID()}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getStudentID()}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getStudentFullname()}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(pageContext.getAttribute("temp"))%></td>                                                
                                                 <c:set var="temp" value="${record.getDateSubmitted()}"/>
-                                                <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(pageContext.getAttribute("temp"))%></td>
+                                                <td class="px-6 py-4 whitespace-nowrap"><%
+                                                    Object time = pageContext.getAttribute("temp");
+                                                    if (time == null) {
+                                                        out.println("-");
+                                                    } else {
+                                                        out.println(new SimpleDateFormat("dd-MM-yyyy hh:mm::ss").format((Timestamp) time));
+                                                    }
+                                                    %></td>
+                                                <c:remove var="temp" scope="page"/>
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getNumOfCorrectAnswers()}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getNumOfAnswers()}</td>
-                                                <c:remove var="temp" scope="page"/>
                                                 <td class="px-6 py-4 whitespace-nowrap flex justify-end gap-x-3">
-                                                    <a class="cursor-pointer text-lg text-yellow-500 hover:text-yellow-700"
-                                                       href="viewRecord?recordID=<c:out value="${record.getRecordID()}" />&examCode=<c:out value="${param.examCode}" />">View</a>
+                                                    <a                                                    
+                                                        <c:if test="${record.getDateSubmitted() != null}">
+                                                            class="cursor-pointer text-lg text-yellow-500 hover:text-yellow-700" 
+                                                            href="viewRecord?recordID=<c:out value="${record.getRecordID()}" />&examCode=<c:out value="${param.examCode}" />"
+                                                        </c:if>
+                                                        <c:if test="${record.getDateSubmitted() == null}">
+                                                            class="cursor-not-allowed text-lg text-gray-500"        
+                                                            onclick="return false;"
+                                                        </c:if>
+
+                                                        >View</a>
                                                     <a class="cursor-pointer text-lg text-red-500 hover:text-red-700"
                                                        onclick="removeRecord(<c:out value="${record.getRecordID()}"/>,
                                                        <c:out value="'${record.getStudentFullname()}'"/>)">Remove</a>
@@ -122,7 +145,7 @@
                     </div>
                 </div>
             </div>           
-        </main>
+        </main>      
         <script>
             function removeRecord(id, studentFullname) {
                 document.getElementById('remove-msg').innerHTML = 'Do you want to remove the record of <br/>"' + studentFullname + '"?';

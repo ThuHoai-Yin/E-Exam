@@ -39,7 +39,7 @@
                                                                         '<br />')}</p>
                                 </div>
                                 <div class="mr-0 ml-auto w-36 relative">
-                                    <p class="font-normal text-md text-blue-700 text-right absolute bottom-0">
+                                    <p class="font-normal text-md text-blue-700 text-right absolute bottom-0 right-0">
                                         Choose ${question.getMaxChoose()} answer${question.getMaxChoose() > 1 ? 's' : ''}
                                     </p>
                                 </div>
@@ -50,14 +50,14 @@
                                     <div>
                                         <label class="inline-flex items-center w-full">
                                             <input
-                                                class="form-checkbox h-5 w-5 text-blue-600"
+                                                class="form-checkbox p-3 text-blue-600"
                                                 onchange="checkboxOnChange(
                                                                 document.querySelectorAll('#answer-container-<c:out value="${qCount.count}" /> input:checked'),
                                                                 document.querySelectorAll('#answer-container-<c:out value="${qCount.count}" /> input:not(:checked)'), this,
                                                 <c:out value="${question.getMaxChoose()}" />)"
                                                 type="checkbox"
                                                 name="answer.${answer.getAnswerID()}" />
-                                            <span class="ml-2 text-gray-700">${answer.getContent()}</span>
+                                            <span class="ml-4 text-gray-700">${answer.getContent()}</span>
                                         </label>
                                     </div>
                                 </c:forEach>

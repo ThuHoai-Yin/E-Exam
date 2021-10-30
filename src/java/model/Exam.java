@@ -7,6 +7,7 @@ import java.util.List;
 public class Exam {
 
     private String examCode;
+    private String examName;
     private List<Question> questions;
     private Timestamp openDate;
     private Timestamp closeDate;
@@ -14,8 +15,9 @@ public class Exam {
     private Timestamp examEndTime;
     private int duration;
 
-    public Exam(String examCode, List<Question> questions, Timestamp openDate, Timestamp closeDate, String creatorFullName, Timestamp examEndTime, int duration) {
+    public Exam(String examCode, String examName, List<Question> questions, Timestamp openDate, Timestamp closeDate, String creatorFullName, Timestamp examEndTime, int duration) {
         this.examCode = examCode;
+        this.examName = examName;
         this.questions = questions;
         this.openDate = openDate;
         this.closeDate = closeDate;
@@ -32,6 +34,14 @@ public class Exam {
         this.examCode = examCode;
     }
 
+    public String getExamName() {
+        return examName;
+    }
+
+    public void setExamName(String examName) {
+        this.examName = examName;
+    }
+    
     public List<Question> getQuestions() {
         return questions;
     }

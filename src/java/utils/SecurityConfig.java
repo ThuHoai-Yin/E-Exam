@@ -8,7 +8,7 @@ import model.Role;
 public class SecurityConfig {
 
     private static final Set<String> needAuthPages = new HashSet<String>(
-            Arrays.asList(new String[]{"/", "/home", "/takeExam", "/manageAccount", "/manageBank", "/manageExam", "/createBank", "/viewExam", "/viewRecord"})
+            Arrays.asList(new String[]{"/", "/home", "/accountInfo", "/takeExam", "/manageAccount", "/manageBank", "/manageExam", "/createBank", "/viewBank", "/viewExam", "/viewRecord"})
     );
     private static final String[] prohibited = new String[]{"^.*\\.jsp$"};
 

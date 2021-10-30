@@ -64,7 +64,7 @@ public class CreateBankController extends HttpServlet {
             try (PreparedStatement stm = conn.prepareStatement(query)) {
                 stm.setString(1, bankName);
                 stm.setString(2, courseName);
-                stm.setInt(3, 1);
+                stm.setInt(3, user.getUserID());
                 ResultSet result = stm.executeQuery();
                 if (!result.next()) {
                 }

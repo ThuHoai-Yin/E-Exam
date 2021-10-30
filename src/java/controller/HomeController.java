@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import model.User;
 import model.Exam;
-import model.Question;
 import utils.DataAccessObject;
 
 @WebServlet(name = "Home", urlPatterns = {"/home"})

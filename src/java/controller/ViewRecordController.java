@@ -28,7 +28,7 @@ public class ViewRecordController extends HttpServlet {
 
             int recordID = Integer.parseInt(recordIDTxt);
             request.setAttribute("questions", DataAccessObject.getQuestionsAndCorrectAnswer(examCode, user.getUserID()));
-            request.setAttribute("selected", DataAccessObject.getSelectedAnswers(recordID, user.getUserID()));
+            request.setAttribute("detail", DataAccessObject.getRecordDetail(recordID, user.getUserID()));
             request.getRequestDispatcher("viewRecord.jsp").forward(request, response);
         } catch (Exception ex) {
             request.setAttribute("msg", "Invalid request!");

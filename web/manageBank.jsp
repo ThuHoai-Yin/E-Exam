@@ -57,7 +57,9 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("dd-MM-yyyy hh:mm").format(pageContext.getAttribute("temp"))%></td>
                                             <c:remove var="temp" scope="page"/>
-                                            <td class="px-6 py-4 whitespace-nowrap flex justify-end gap-x-3">
+                                            <td class="px-6 py-4 whitespace-nowrap flex justify-end gap-x-3">    
+                                                <a class="cursor-pointer text-lg text-yellow-500 hover:text-yellow-700"
+                                                        href="viewBank?bankID=<c:out value="${bank.getBankID()}" />">View</a>
                                                 <a <c:if test="${bank.getCreatorID() == user.getUserID()}">
                                                         class="cursor-pointer text-lg text-red-500 hover:text-red-700"
                                                         onclick="removeBank(<c:out value="'${bank.getBankID()}'"/>, <c:out value="'${bank.getBankName()}'"/>)"                                                       
@@ -125,7 +127,7 @@
             </div> 
             <script>
                 function removeBank(id, name) {
-                    document.getElementById('remove-msg').innerHTML = 'Do you want to remove "' + name + '"?<br/>This action may removes some related questions';
+                    document.getElementById('remove-msg').innerHTML = 'Do you want to remove "' + name + '"?<br/>This action may remove some related questions';
                     document.getElementById('remove-modal').style.display = 'flex';
                     document.getElementById('remove-bankID').value = id;
                 }
