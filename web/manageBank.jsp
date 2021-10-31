@@ -55,7 +55,7 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">${bank.getQuestions().size()}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("dd-MM-yyyy hh:mm").format(pageContext.getAttribute("temp"))%></td>
+                                            <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("dd-MM-yyyy HH:mm").format(pageContext.getAttribute("temp"))%></td>
                                             <c:remove var="temp" scope="page"/>
                                             <td class="px-6 py-4 whitespace-nowrap flex justify-end gap-x-3">    
                                                 <a class="cursor-pointer text-lg text-yellow-500 hover:text-yellow-700"

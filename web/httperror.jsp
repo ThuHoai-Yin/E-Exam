@@ -17,7 +17,7 @@
                         <p class="font-light text-gray-500">${requestScope.detail}</p>
                     </div>
                 </div>
-                <a href="home" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"> Take Me Home </a>
+                <a href="home" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">Take Me Back</a>
             </div>
         </div>
     </body>

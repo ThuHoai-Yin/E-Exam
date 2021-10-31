@@ -56,7 +56,7 @@
                                                 if (time == null) {
                                                     out.println("-");
                                                 } else {
-                                                    out.println(new SimpleDateFormat("dd-MM-yyyy hh:mm").format((Timestamp) time));
+                                                    out.println(new SimpleDateFormat("dd-MM-yyyy HH:mm").format((Timestamp) time));
                                                 }
                                                 %></td>
                                                 <c:set var="temp" value="${exam.getCloseDate()}"/>   
@@ -65,7 +65,7 @@
                                                 if (time == null) {
                                                     out.println("-");
                                                 } else {
-                                                    out.println(new SimpleDateFormat("dd-MM-yyyy hh:mm").format((Timestamp) time));
+                                                    out.println(new SimpleDateFormat("dd-MM-yyyy HH:mm").format((Timestamp) time));
                                                 }
                                                 %></td>
                                                 <c:remove var="temp" scope="page"/>

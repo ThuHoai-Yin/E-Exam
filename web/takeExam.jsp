@@ -71,7 +71,6 @@
         </main>
         <script>
             const endTime = Date.parse('<c:out value="${exam.getExamEndTime()}"/>');
-            let counter = 0;
             setInterval(function () {
                 let milliseconds = endTime - new Date();
                 if (milliseconds < 0) {
@@ -82,13 +81,8 @@
                 seconds %= 60;
 
                 document.getElementById('countdown').innerHTML = Math.trunc(mins) + ':' + (seconds < 10 ? '0' : '') + Math.trunc(seconds);
-                if (counter-- === 0) {
-                    let http = new XMLHttpRequest();
-                    http.open('GET', 'ping', true);
-                    http.send();
-                    counter = 30;
-                }
-            }, 1000);
+            }, 1000); 
+                       
             function checkboxOnChange(checkedlist, uncheckedlist, el, maxchoose) {
                 let b = (checkedlist.length + (el.checked ? 1 : 0)) > maxchoose;
                 uncheckedlist.forEach((element) => {

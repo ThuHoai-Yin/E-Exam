@@ -6,6 +6,7 @@
         <link rel="preload" href="assets/background.jpg" as="image" />
         <link rel="preload" href="assets/logo.png" as="image" />
         <link href="https://unpkg.com/@tailwindcss/custom-forms@0.2.1/dist/custom-forms.min.css" rel="stylesheet" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ifvisible/1.0.6/ifvisible.min.js"></script>
     </head>
     <body class="bg-cover bg-fixed" style="background-image: url('assets/background.jpg')">
         <c:set var="user" value="${sessionScope.user}" />
@@ -97,6 +98,27 @@
             </div>
         </div>
         <script>
+    
+            var timer = startHeartbeat();
+            
+            ifvisible.on('idle', function () {
+                if (timer !== null)
+                    clearTimeout(timer);
+                timer = null;
+            });
+
+            ifvisible.on('wakeup', function () {
+                timer = startHeartbeat()
+            });
+
+            function startHeartbeat() {
+                return setInterval(function () {
+                    let http = new XMLHttpRequest();
+                    http.open('GET', 'ping', true);
+                    http.send();
+                }, 60000);
+            }
+    
             window.onclick = function (event) {
                 if (!event.target.matches('#dropdown-btn')) {
                     document.getElementById('dropdown').style.display = 'none';

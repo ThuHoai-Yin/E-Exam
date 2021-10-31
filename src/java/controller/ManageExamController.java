@@ -50,7 +50,7 @@ public class ManageExamController extends HttpServlet {
                         throw new Exception("Null");
                     }
 
-                    DateFormat formatter = new SimpleDateFormat("hh:mm dd/MM/yyyy");
+                    DateFormat formatter = new SimpleDateFormat("HH:mm dd/MM/yyyy");
                     Timestamp openDate = null,
                      closeDate = null;
                     int bankID,
@@ -63,6 +63,8 @@ public class ManageExamController extends HttpServlet {
                     if (!closeDateTxt.isEmpty()) {
                         closeDate = new Timestamp(formatter.parse(closeDateTxt).getTime());
                     }
+                    System.out.println(openDate);
+                    System.out.println(closeDate);
                     numOfQuestions = Integer.parseInt(numOfQuestionsTxt);
                     duration = Integer.parseInt(durationTxt);
 

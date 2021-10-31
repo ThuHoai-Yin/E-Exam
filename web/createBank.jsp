@@ -85,6 +85,7 @@
         </main>
         <script>
             var counter = 0;
+
             function addAnswer(btn) {
                 let parentId = btn.parentElement.getElementsByTagName('textarea')[0].getAttribute('name').split('.')[1];
                 let target = btn.parentElement.getElementsByClassName('answer-container')[0];

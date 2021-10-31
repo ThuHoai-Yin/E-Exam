@@ -61,14 +61,14 @@
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getRecordID()}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getStudentID()}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">${record.getStudentFullname()}</td>
-                                                <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(pageContext.getAttribute("temp"))%></td>                                                
+                                                <td class="px-6 py-4 whitespace-nowrap"><%=new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(pageContext.getAttribute("temp"))%></td>                                                
                                                 <c:set var="temp" value="${record.getDateSubmitted()}"/>
                                                 <td class="px-6 py-4 whitespace-nowrap"><%
                                                     Object time = pageContext.getAttribute("temp");
                                                     if (time == null) {
                                                         out.println("-");
                                                     } else {
-                                                        out.println(new SimpleDateFormat("dd-MM-yyyy hh:mm::ss").format((Timestamp) time));
+                                                        out.println(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format((Timestamp) time));
                                                     }
                                                     %></td>
                                                 <c:remove var="temp" scope="page"/>
